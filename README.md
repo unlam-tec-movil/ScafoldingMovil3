@@ -4,9 +4,6 @@
 
 - [Configuración](#configuration)
 - [Arquitectura Hexagonal](#arquitectura-hexagonal)
-- [Domain](#domain)
-    - [Modelos](#modelos)
-    - [Use Cases](#use-cases--services)
 - [UI](#ui)
     - [Composables](#composables)
     - [SPA](#single-activity-application)
