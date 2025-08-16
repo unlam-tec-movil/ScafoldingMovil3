@@ -1,3 +1,7 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -8,9 +12,17 @@ plugins {
     alias(libs.plugins.kotlin.compose.compiler)
 }
 
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+        languageVersion.set(KotlinVersion.KOTLIN_2_1)
+        apiVersion.set(KotlinVersion.KOTLIN_2_1)
+    }
+}
+
 android {
     namespace = "ar.edu.unlam.mobile.scaffolding"
-    compileSdk = 34
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "ar.edu.unlam.mobile.scaffolding"
@@ -37,9 +49,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-    }
-    kotlinOptions {
-        jvmTarget = "17"
     }
     buildFeatures {
         compose = true
