@@ -29,7 +29,7 @@ fun BottomBar(controller: NavHostController) {
             },
         )
         NavigationBarItem(
-            selected = navBackStackEntry?.destination?.hierarchy?.any { it.route == "home" } == true,
+            selected = navBackStackEntry?.destination?.hierarchy?.any { it.route == "user/{id}" } == true,
             onClick = { controller.navigate("user/test") },
             icon = {
                 Icon(
