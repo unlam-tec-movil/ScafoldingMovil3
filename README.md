@@ -4,9 +4,6 @@ g# Mobile Scaffolding
 
 - [Configuración](#configuration)
 - [Arquitectura Hexagonal](#arquitectura-hexagonal)
-- [Domain](#domain)
-    - [Modelos](#modelos)
-    - [Use Cases](#use-cases--services)
 - [UI](#ui)
     - [Composables](#composables)
     - [SPA](#single-activity-application)
@@ -18,11 +15,19 @@ g# Mobile Scaffolding
 - [Data](#data)
 
 Este repositorio se presenta como una referencia para organizar un proyecto de Android. La elección
-de packages está basada en las recomendaciones de android [1] y en la arquitectura hexagonal.
+de packages está basada en las recomendaciones de android[1].
 
 ![image](https://github.com/unlam-tec-movil/ScaffoldingV2/assets/5816687/b8a3641e-8c5f-48e0-a995-7a7b9594dae3)
 
-# Configuration
+## Consideraciones previas
+
+Para este documento usaremos como ejemplo una aplicación de notas. Esta aplicación estará compuesta
+por dos modelos de negocio: Nota y Usuario. Un usuario puede tener muchas notas.
+
+Esto significa que, para cada explicación que daremos usaremos estos dos modelos de negocio como
+ejemplos.
+
+## Configuración
 
 El proyecto ejecuta dos workflows de github en cada PR. El primero realiza análisis estático de
 código usando ktlint y gradle. El segundo ejecuta los tests de la aplicación.
@@ -30,103 +35,7 @@ código usando ktlint y gradle. El segundo ejecuta los tests de la aplicación.
 Para configurar el proyecto en Android Studio, se debe de tener instalado el plugin
 de [ktlint](https://plugins.jetbrains.com/plugin/15057-ktlint)
 
-# Arquitectura Hexagonal
-
-Propone independizar la lógica de negocio del context o de detalles de implementación.
-Las Comunicaciones de entrada y salida dependen de la lógica de negocio y no al revés.
-
-Esta arquitectura clasifica a los tipos de entrada y salida en 4:
-
-* Eventos de negocio: (Interfaz de usuario)
-* Administración: (Logging, CLI de Administración)
-* Notificación: (SMS, Emails, etc)
-* Peristencia: (Base de datos, Archivos)
-
-## Componentes
-
-### Puertos
-
-Los accesos hacia la aplicación (en nuestro caso, la interacción del usuario), y los accesos desde
-la aplicación hacia el exterior se realizan mediante Puertos de Entrada y Salida.
-Dichos puertos definen interfaces de negocio. Es decir, reciben y devuelven modelos puros de
-negocio.
-
-### Adapters
-
-La implementación de la comunicación de la aplicación con recursos externos se realiza mediante
-adapters.
-En nuestro cursada veremos que dichos adapters son los accesos a la base de datos y hacia los
-servicios externos (implementaciones de Room y Retrofit)
-
-## Diseño
-
-### Esquema General
-
-![image](https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Hexagonal_Architecture.svg/500px-Hexagonal_Architecture.svg.png)
-
-### Interacción Puertos y Adapters
-
-![AdaptersAndPorts](https://github.com/unlam-tec-movil/ScaffoldingV2/assets/5816687/32d0adfc-c6e6-4402-b1c7-9d69cf6a0d1a)
-
-### Arquitectura Android y Hexa
-
-![AndroidXHexa](https://github.com/unlam-tec-movil/ScaffoldingV2/assets/5816687/b8cecf19-6a73-466c-885a-294a7fe8b972)
-
-# Domain
-
-En esta capa se ubicará la lógida de negocio de nuestra aplicación.
-Idealmente, debiera de haber un package por cada dominio[1] de negocio.
-
-Dentro de cada dominio, se ubicarán los siguientes elementos: DI, Models, UseCases/Services.
-
-## Inyección de dependencias
-
-DI: Este package es para definir la inyección de dependencias[2] mediante un modulo.
-
-## Modelos
-
-Models: Este package tiene los modelos de negocio de este dominio. Idealmente debieran de ser
-o Aggregates o al menos no anémicos.
-
-### Aggregate Models
-
-Los "aggregates" abarcan diversos modelos vinculados entre sí. Típicamente tendremos un modelo de,
-en términos DER[3] una entidad fuerte y otras entidades débiles que dependen de la fuerte. Por
-ejemplo, en un sistema de facturación, el modelo de factura es el agregado fuerte y los items de
-factura son los agregados débiles. Al modelo
-se accederá siempre a través de esta entidad fuerte.
-
-Nota: Estas entidades son de negocio, no de base de datos. Por lo tanto, no deben de tener
-anotaciones de persistencia.
-
-### Anemic Models
-
-Existe un anti patrón de diseño llamado "anemic model" que consiste en tener modelos que solo tienen
-atributos y
-getters. Esto rompe con la idea de "Programación orientada a objetos" que combina datos y procesos (
-comportamiento)[4].
-
-Idealmente, nuestros modelos de negocio debieran de poder tener comportamiento.
-
-## Use Cases / Services
-
-Estos objetos definirán firmas y comportamiento para los casos de uso del dominio. Exponen las
-acciones que un tercero
-puede hacer en nuestra aplicación. Habitualmente se los conoce como "servicios" o "casos de uso" y
-abarcan varias
-fuentes de información en caso de necesitar obtener estado de diferentes modelos del propio dominio.
-
-Estas clases no debieran de depender de ninguna anotación o implementación ajena a lo que es el
-dominio. Aquí no
-debieramos de encontrarnos con anotaciones de Hilt (Inyección de dependencias de android) quizá si
-de Dagger (inyección
-de dependencias de Kotlin). Tampoco debieramos de encontrarnos con dependencias de acceso a bases de
-datos como Room o
-de comunicación HTTP como retrofit. Finalmente, tampoco debieran de haber viewmodel o livedata que
-son componentes
-Android.
-
-# UI
+## UI
 
 En esta capa se diseña la interacción con el usuario. Aquí se definirán pantallas, componentes
 visuales y el estado de
@@ -282,7 +191,7 @@ controller.navigate("segundo/1")
 
 Si queremos que un composable pueda navegar, deberá de recibir por parámetro un NavHostController.
 
-# Data
+## Data
 
 En esta capa se encontrarán las implementaciones para la comunicación con servicios externos a la
 apliocación. Ya sean bases de datos, servicios web, etc.
@@ -296,61 +205,38 @@ conexión hacia una API externa, podremos tener un package de nombre "network".
 Si necesitamos implementar acceso a una base de dato local, podremos tener un package de nombre
 "local". En "idioma" Clean
 
-## Inyección de dependencias
+### Repositories
 
-DI: Este package es para definir la inyección de dependencias[2] mediante un modulo.
+Aqui se define para cada modelo de negocio el repositorio y la implementacion por defecto
+correspondiente. Tendremos un package por cada tipo de dato por ejemplo un package "UserRepository"
+para el modelo de negocio de usuario y otro "PostRepository" para el modelo de negocio de post.
 
-## Repositorio
-
-Repository: Este package definirá la interfaz del repositorio para el dominio al que pertenece.
-También incluirá las
-implementaciones que construyamos de esta. Hay algunas particularidades aquí: La interfaz que
-definimos aquí es de cara
-al dominio.
-
-Esto quiere decir que aquí expondremos al recurso al resto de la aplicación. Por ejemplo: si el
-dominio es
-Auto, aquí tendremos un repositorio de autos. La interfaz de este repositorio será la que exponga
-los métodos de acceso
-al recurso auto y la implementación será el modo en el que iremos a "buscar" a este recurso.
-
-### Layer DATA en Android y Clean Architecture
-
-En Android, la capa de datos es la que se encarga de la comunicación con servicios externos. Esto es
-igual a lo que sucede en Clean Architecture.
-
-Es por ello que la interfaz de los repositorios vive aquí en Data y no como un puerto del dominio.
-
-De todos modos, recomendamos que las firmas que se definen aquí respondan a modelos de negocio y no
-a modelos de Data.
-Es decir,
-devolver aquí modelos definidos en Domain y no los que hayamos definido en las implemnentaciones que
-veremos más
-adelante.
-
-### Implementación default
+#### Implementación default
 
 En este package también tendremos una implementación default del repositorio. Esta implementación
-funcionará como "
-agregadora" de las diferentes implementaciones / adapters que existan en esta capa. Esto nos dará
-flexibilidad para ir a
-buscar rcursos de diferente modo.
+funcionará como "agregadora" de las diferentes implementaciones / adapters que existan en esta capa.
+Esto nos dará flexibilidad para ir a buscar rcursos de diferente modo.
 
-## Adapters, packages opcionales
+## Data Sources
 
 Aquí estarán los adapters de los recursos externos. A diferencia de lo que se construye dentro de
-repository, las clases aquí son de cara a los recursos externos. Es decir, tendremos una
-implementación por cada fuente de información. Puede darse el caso de que sean coincidentes los
-recursos expuestos en el package repository y lo que vayamos a buscar como no. Podemos llegar a
-necesitar ir a buscar a varias fuentes de información lo necesario para exponer un recurso.
+repository que son de cara a un modelo, las clases aquí son de cara a los recursos externos. Es
+decir, tendremos una implementación por cada fuente de información. Puede darse el caso de que sean
+coincidentes los recursos expuestos en el package repository y lo que vayamos a buscar como no.
+Podemos llegar a necesitar ir a buscar a varias fuentes de información lo necesario para exponer un
+recurso.
+
+Dentro de esas implementaciones solemos tener dos:
 
 ### Network
 
-Aquí estará la implementación del consumo de apis externas.
+Aquí estará la implementación del consumo de apis externas. En este package usaremos Retrofit para
+la gestión de requests hacia la API.
 
 ### Local
 
-Aquí estará la implementación del consumo de bases de datos locales.
+Aquí estará la implementación del consumo de bases de datos locales. La herramienta para gestionar
+estas bases es Room.
 
 ![Power](https://github.com/unlam-tec-movil/ScaffoldingV2/assets/5816687/200d9f10-2a71-409a-90ba-103ddffa9758)
 

@@ -9,11 +9,15 @@ import javax.inject.Inject
 
 @Immutable
 sealed interface HelloMessageUIState {
-    data class Success(val message: String) : HelloMessageUIState
+    data class Success(
+        val message: String,
+    ) : HelloMessageUIState
 
     data object Loading : HelloMessageUIState
 
-    data class Error(val message: String) : HelloMessageUIState
+    data class Error(
+        val message: String,
+    ) : HelloMessageUIState
 }
 
 data class HomeUIState(
