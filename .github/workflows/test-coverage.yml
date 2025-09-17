@@ -33,8 +33,3 @@ jobs:
           min-coverage-changed-files: 70
           coverage-counter-type: LINE
 
-      - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
-        with:
-          fail_ci_if_error: true
-          files: app/build/reports/kover/reportRelease.xml
