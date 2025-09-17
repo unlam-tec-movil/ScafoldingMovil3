@@ -57,7 +57,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
 fun MainScreen() {
     // Controller es el elemento que nos permite navegar entre pantallas. Tiene las acciones
@@ -84,7 +83,7 @@ fun MainScreen() {
                         )
                     } else {
                         ButtonDefaults.textButtonColors(
-                            contentColor = MaterialTheme.colorScheme.inversePrimary
+                            contentColor = MaterialTheme.colorScheme.inversePrimary,
                         )
                     }
 
@@ -128,6 +127,5 @@ fun MainScreen() {
                 UserScreen(userId = id, modifier = Modifier.padding(paddingValue))
             }
         }
-        Text("holas")
     }
 }
