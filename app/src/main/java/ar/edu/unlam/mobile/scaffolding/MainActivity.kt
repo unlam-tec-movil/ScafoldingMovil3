@@ -30,7 +30,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
-import ar.edu.unlam.mobile.scaffolding.ui.screens.FormScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.SettingsScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.HOME_SCREEN_ROUTE
 import ar.edu.unlam.mobile.scaffolding.ui.screens.HomeScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.UserScreen
@@ -112,9 +112,10 @@ fun MainScreen() {
                 HomeScreen(modifier = Modifier.padding(paddingValue))
             }
             composable("form") {
-                FormScreen(
+                SettingsScreen(
                     modifier = Modifier.padding(paddingValue),
-                    snackbarHostState = snackBarHostState,
+                    navController = controller,
+                    onLogout = {}
                 )
             }
             composable(
