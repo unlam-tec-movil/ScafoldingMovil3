@@ -1,9 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.ui.components
 
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.Settings
@@ -12,7 +9,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
@@ -36,15 +32,15 @@ fun BottomBar(controller: NavHostController) {
             icon = {
                 Icon(
                     imageVector = Icons.Filled.Pets,
-                    contentDescription = "Home"
+                    contentDescription = "Home",
                 )
             },
-
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color.White, // Ícono activo bien visible
-                unselectedIconColor = Color(0xFFFFEBEE), // Rosa pálido, suave y legible
-                indicatorColor = Color.White.copy(alpha = 0.2f), // Fondo del ítem activo, sutil
-            )
+            colors =
+                NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.White, // Ícono activo bien visible
+                    unselectedIconColor = Color(0xFFFFEBEE), // Rosa pálido, suave y legible
+                    indicatorColor = Color.White.copy(alpha = 0.2f), // Fondo del ítem activo, sutil
+                ),
         )
         NavigationBarItem(
             selected = navBackStackEntry?.destination?.hierarchy?.any { it.route == "user/{id}" } == true,
@@ -52,15 +48,15 @@ fun BottomBar(controller: NavHostController) {
             icon = {
                 Icon(
                     imageVector = Icons.Filled.Place,
-                    contentDescription = "User"
+                    contentDescription = "User",
                 )
             },
-
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color.White, // Ícono activo bien visible
-                unselectedIconColor = Color(0xFFFFEBEE), // Rosa pálido, suave y legible
-                indicatorColor = Color.White.copy(alpha = 0.2f), // Fondo del ítem activo, sutil
-            )
+            colors =
+                NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.White, // Ícono activo bien visible
+                    unselectedIconColor = Color(0xFFFFEBEE), // Rosa pálido, suave y legible
+                    indicatorColor = Color.White.copy(alpha = 0.2f), // Fondo del ítem activo, sutil
+                ),
         )
         NavigationBarItem(
             selected = navBackStackEntry?.destination?.hierarchy?.any { it.route == FORM_ROUTE } == true,
@@ -68,16 +64,15 @@ fun BottomBar(controller: NavHostController) {
             icon = {
                 Icon(
                     imageVector = Icons.Filled.Settings,
-                    contentDescription = "Settings"
+                    contentDescription = "Settings",
                 )
             },
-
-            colors = NavigationBarItemDefaults.colors(
-                selectedIconColor = Color.White, // Ícono activo bien visible
-                unselectedIconColor = Color(0xFFFFEBEE), // Rosa pálido, suave y legible
-                indicatorColor = Color.White.copy(alpha = 0.2f), // Fondo del ítem activo, sutil
-            )
+            colors =
+                NavigationBarItemDefaults.colors(
+                    selectedIconColor = Color.White, // Ícono activo bien visible
+                    unselectedIconColor = Color(0xFFFFEBEE), // Rosa pálido, suave y legible
+                    indicatorColor = Color.White.copy(alpha = 0.2f), // Fondo del ítem activo, sutil
+                ),
         )
     }
 }
-
