@@ -21,6 +21,5 @@ fun PersonalDetailsScreen(modifier: Modifier = Modifier) {
             style = MaterialTheme.typography.headlineMedium
         )
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Acá podrías mostrar nombre, email, teléfono, etc.")
     }
 }
