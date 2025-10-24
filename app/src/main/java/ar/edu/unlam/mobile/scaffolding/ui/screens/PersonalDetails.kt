@@ -10,15 +10,16 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun PersonalDetailsScreen(modifier: Modifier = Modifier) {
     Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(24.dp),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = "Detalles personales",
-            style = MaterialTheme.typography.headlineMedium
+            text = "Detalles personales, configuracion",
+            style = MaterialTheme.typography.headlineMedium,
         )
         Spacer(modifier = Modifier.height(16.dp))
     }
