@@ -11,7 +11,6 @@ import ar.edu.unlam.mobile.scaffolding.ui.components.Greeting
 
 const val HOME_SCREEN_ROUTE = "home"
 
-
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,

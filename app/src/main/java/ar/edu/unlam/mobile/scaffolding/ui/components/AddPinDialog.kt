@@ -11,15 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-
 @Composable
- fun AddPinDialog(
+fun AddPinDialog(
     title: String,
     onTitleChange: (String) -> Unit,
     snippet: String,
     onSnippetChange: (String) -> Unit,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -29,13 +28,13 @@ import androidx.compose.ui.unit.dp
                 OutlinedTextField(
                     value = title,
                     onValueChange = onTitleChange,
-                    label = { Text("Título") }
+                    label = { Text("Título") },
                 )
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = snippet,
                     onValueChange = onSnippetChange,
-                    label = { Text("Descripción (opcional)") }
+                    label = { Text("Descripción (opcional)") },
                 )
             }
         },
@@ -44,6 +43,6 @@ import androidx.compose.ui.unit.dp
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Cancelar") }
-        }
+        },
     )
 }

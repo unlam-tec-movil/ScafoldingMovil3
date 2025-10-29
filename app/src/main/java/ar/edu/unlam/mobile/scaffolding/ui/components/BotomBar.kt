@@ -64,7 +64,7 @@ fun BottomBar(controller: NavHostController) {
 
 @Preview
 @Composable
-fun caca(){
+fun caca() {
     val controller = rememberNavController()
 
     BottomBar(controller)

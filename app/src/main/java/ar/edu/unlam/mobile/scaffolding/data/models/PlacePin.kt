@@ -4,9 +4,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PlacePin(
-    val id: String = java.util.UUID.randomUUID().toString(),
+    val id: String =
+        java.util.UUID
+            .randomUUID()
+            .toString(),
     val lat: Double,
     val lng: Double,
     val title: String,
-    val snippet: String? = null
+    val snippet: String? = null,
 )

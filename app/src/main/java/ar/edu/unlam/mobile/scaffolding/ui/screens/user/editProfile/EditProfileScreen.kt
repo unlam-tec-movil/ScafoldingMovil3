@@ -6,8 +6,5 @@ import androidx.navigation.NavController
 val EDIT_PROFILE_ROUTE = "edit"
 
 @Composable
-fun EditProfile(navController: NavController){
-
-
-
+fun EditProfile(navController: NavController) {
 }

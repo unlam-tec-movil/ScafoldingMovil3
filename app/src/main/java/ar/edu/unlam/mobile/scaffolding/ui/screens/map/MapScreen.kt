@@ -58,7 +58,7 @@ const val MAP_ROUTE = "map"
 
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 @Composable
-fun MapScreen(viewmodel : MapViewModel = hiltViewModel()) {
+fun MapScreen(viewmodel: MapViewModel = hiltViewModel()) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val pins by viewmodel.pins.collectAsState()
@@ -76,8 +76,9 @@ fun MapScreen(viewmodel : MapViewModel = hiltViewModel()) {
     val hasLocationPermission by remember {
         mutableStateOf(
             ContextCompat.checkSelfPermission(
-                context, android.Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED
+                context,
+                android.Manifest.permission.ACCESS_FINE_LOCATION,
+            ) == PackageManager.PERMISSION_GRANTED,
         )
     }
 
@@ -85,9 +86,10 @@ fun MapScreen(viewmodel : MapViewModel = hiltViewModel()) {
         RequestLocationPermission()
     }
 
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(LatLng(1.0, -58.791), 13f) //Moreno pa
-    }
+    val cameraPositionState =
+        rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(LatLng(1.0, -58.791), 13f) // Moreno pa
+        }
 
     var deleteCandidate by remember { mutableStateOf<PlacePin?>(null) }
     var title by remember { mutableStateOf("") }
@@ -102,7 +104,7 @@ fun MapScreen(viewmodel : MapViewModel = hiltViewModel()) {
                 val here = LatLng(it.latitude, it.longitude)
                 cameraPositionState.animate(
                     update = CameraUpdateFactory.newLatLngZoom(here, 15f),
-                    durationMs = 800
+                    durationMs = 800,
                 )
             }
         }
@@ -111,39 +113,45 @@ fun MapScreen(viewmodel : MapViewModel = hiltViewModel()) {
     GoogleMap(
         modifier = Modifier.fillMaxSize(),
         cameraPositionState = cameraPositionState,
-        properties = MapProperties(
-            isMyLocationEnabled = hasLocationPermission
-        ),
+        properties =
+            MapProperties(
+                isMyLocationEnabled = hasLocationPermission,
+            ),
         onMapLongClick = { latLng ->
             viewmodel.askAddAt(latLng)
             title = ""
             snippet = ""
         },
-
-        uiSettings = MapUiSettings(
-            myLocationButtonEnabled = true,
-            zoomControlsEnabled = false,
-            compassEnabled = true
-        )
+        uiSettings =
+            MapUiSettings(
+                myLocationButtonEnabled = true,
+                zoomControlsEnabled = false,
+                compassEnabled = true,
+            ),
     ) {
         MarkerInfoWindowContent(
             state = rememberMarkerState(position = LatLng(-34.653, -58.791)),
             title = "perros",
-            onClick = { false }) { marker ->
+            onClick = { false },
+        ) { marker ->
             Card(
                 modifier = Modifier.width(220.dp),
                 shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
             ) {
                 Column(Modifier.padding(12.dp)) {
                     coil.compose.AsyncImage(
-                        model = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fben10.fandom.com%2Fes%2Fwiki%2FHighbreed&psig=AOvVaw3QIPq5y6onrTDqxijv5JsC&ust=1761415939421000&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOjrwc_AvZADFQAAAAAdAAAAABAE",
+                        model =
+                            "https://www.google.com/url?sa=i&url=https%3A%2F%2Fben10.fandom.com" +
+                                "%2Fes%2Fwiki%2FHighbreed&psig=AOvVaw3QIPq5y6onrTDqxijv5JsC&ust=1761415939421000" +
+                                "&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOjrwc_AvZADFQAAAAAdAAAAABAE",
                         contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(120.dp)
-                            .clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(120.dp)
+                                .clip(RoundedCornerShape(12.dp)),
+                        contentScale = ContentScale.Crop,
                     )
                     Spacer(Modifier.height(8.dp))
                     Text(marker.title ?: "Sin título", style = MaterialTheme.typography.titleMedium)
@@ -163,7 +171,7 @@ fun MapScreen(viewmodel : MapViewModel = hiltViewModel()) {
                 },
                 onInfoWindowLongClick = {
                     Toast.makeText(context, "Funca", Toast.LENGTH_SHORT).show()
-                }
+                },
             )
         }
     }
@@ -177,22 +185,23 @@ fun MapScreen(viewmodel : MapViewModel = hiltViewModel()) {
             onConfirm = {
                 viewmodel.confirmAdd(title.ifBlank { "Marcador" }, snippet.ifBlank { null })
             },
-            onDismiss = { viewmodel.cancelAdd() }
+            onDismiss = { viewmodel.cancelAdd() },
         )
     }
 }
 
-
 @Composable
 fun RequestLocationPermission() {
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = RequestPermission()
-    ){}
-    Box(Modifier.fillMaxSize()){
-        Button( modifier = Modifier.align(Alignment.Center),
-            onClick = {permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-        })
-        {  Text("Solicitar Permiso de Ubicacion") }
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = RequestPermission(),
+        ) {}
+    Box(Modifier.fillMaxSize()) {
+        Button(
+            modifier = Modifier.align(Alignment.Center),
+            onClick = {
+                permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
+            },
+        ) { Text("Solicitar Permiso de Ubicacion") }
     }
 }
-
