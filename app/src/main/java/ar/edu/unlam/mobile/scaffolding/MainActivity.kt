@@ -39,6 +39,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import ar.edu.unlam.mobile.scaffolding.ui.components.AppTopBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
 import ar.edu.unlam.mobile.scaffolding.ui.screens.home.HOME_SCREEN_ROUTE
@@ -100,16 +101,18 @@ fun MainScreen() {
     val snackBarHostState = remember { SnackbarHostState() }
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Petapp pa") },
-                navigationIcon = {
-                    Button(onClick = {}, modifier = Modifier) {
+            AppTopBar(
+                title = "Petapp",
+                onMenuClick = { /* abrir drawer o filtros */ },
+                actions = {
+                    IconButton(onClick = { /* acción secundaria */ }) {
                         Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Filters",
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Agregar",
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                },
+                }
             )
         },
         bottomBar = { BottomBar(controller = controller) },
@@ -180,10 +183,13 @@ fun MainScreen() {
 
             composable(
                 route = "user/{id}",
-                arguments = listOf(navArgument("id") { type = NavType.StringType }),
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) { navBackStackEntry ->
                 val id = navBackStackEntry.arguments?.getString("id") ?: "1"
-                UserScreen(controller)
+                UserScreen(
+                    controller = controller,
+                    modifier = Modifier.padding(paddingValue)
+                )
             }
             composable("edit") {
                 EditProfile(controller)
