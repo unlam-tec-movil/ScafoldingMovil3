@@ -3,12 +3,19 @@ package ar.edu.unlam.mobile.scaffolding
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -19,8 +26,12 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
@@ -30,20 +41,22 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
-import ar.edu.unlam.mobile.scaffolding.ui.screens.HOME_SCREEN_ROUTE
-import ar.edu.unlam.mobile.scaffolding.ui.screens.HomeScreen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.PersonalDetailsScreen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.SettingsScreen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.UserScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.home.HOME_SCREEN_ROUTE
+import ar.edu.unlam.mobile.scaffolding.ui.screens.home.HomeScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.user.editProfile.EditProfile
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ScaffoldingV2Theme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity :
+    ComponentActivity(),
+    ActivityResultCallback<Any> {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            ScaffoldingV2Theme(dynamicColor = false) {
+            ScaffoldingV2Theme {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -54,8 +67,30 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    val requestPermissonLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            if (isGranted) {
+                setPermissionsText()
+            }
+        }
+
+    private fun hasCammeraPermission(): Boolean = true
+
+    private fun setPermissionsText() {
+    }
+
+    override fun onActivityResult(result: Any) {
+        TODO("Not yet implemented")
+    }
+
+    fun onRequestPermissionsResult() {
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     // Controller es el elemento que nos permite navegar entre pantallas. Tiene las acciones
@@ -64,10 +99,35 @@ fun MainScreen() {
     val controller = rememberNavController()
     val snackBarHostState = remember { SnackbarHostState() }
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Petapp pa") },
+                navigationIcon = {
+                    Button(onClick = {}, modifier = Modifier) {
+                        Icon(
+                            imageVector = Icons.Default.Menu,
+                            contentDescription = "Filters",
+                        )
+                    }
+                },
+            )
+        },
         bottomBar = { BottomBar(controller = controller) },
         floatingActionButton = {
             IconButton(onClick = { controller.navigate("home") }) {
-                Icon(Icons.Filled.Home, contentDescription = "Home")
+                var icon by remember { mutableStateOf(Icons.Default.Add) }
+
+                Icon(
+                    icon,
+                    contentDescription = "Home",
+                    Modifier.clickable {
+                        if (icon == Icons.Default.Add) {
+                            icon = Icons.Default.Close
+                        } else {
+                            icon = Icons.Default.Add
+                        }
+                    },
+                )
             }
         },
         snackbarHost = {
@@ -108,26 +168,25 @@ fun MainScreen() {
         NavHost(navController = controller, startDestination = HOME_SCREEN_ROUTE) {
             // composable es el componente que se usa para definir un destino de navegación.
             // Por parámetro recibe la ruta que se utilizará para navegar a dicho destino.
+
             composable("home") {
                 // Home es el componente en sí que es el destino de navegación.
                 HomeScreen(modifier = Modifier.padding(paddingValue))
             }
-            composable("form") {
-                SettingsScreen(
-                    modifier = Modifier.padding(paddingValue),
-                    navController = controller,
-                    onLogout = {},
-                )
+
+            composable("map") {
+                MapScreen()
             }
+
             composable(
                 route = "user/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
             ) { navBackStackEntry ->
                 val id = navBackStackEntry.arguments?.getString("id") ?: "1"
-                UserScreen(userId = id, modifier = Modifier.padding(paddingValue))
+                UserScreen(controller)
             }
-            composable("personalDetails") {
-                PersonalDetailsScreen(modifier = Modifier.padding(paddingValue))
+            composable("edit") {
+                EditProfile(controller)
             }
         }
     }
