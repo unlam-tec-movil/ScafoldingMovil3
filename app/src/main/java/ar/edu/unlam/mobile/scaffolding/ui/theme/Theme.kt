@@ -13,7 +13,10 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.core.view.WindowCompat
+import ar.edu.unlam.mobile.scaffolding.R
 
 private val DarkColorScheme =
     darkColorScheme(
@@ -37,6 +40,10 @@ private val LightColorScheme =
     onSurface = Color(0xFF1C1B1F),
      */
     )
+
+val PetFinderFont = FontFamily(
+    Font(R.font.font_pet_finder)
+)
 
 @Composable
 fun ScaffoldingV2Theme(

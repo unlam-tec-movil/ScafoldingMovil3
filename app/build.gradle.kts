@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose.compiler)
+    id("com.google.gms.google-services")
 }
 
 tasks.withType<KotlinCompile>().configureEach {
@@ -61,6 +62,14 @@ android {
 }
 
 dependencies {
+
+
+   // implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+
+    implementation("com.google.firebase:firebase-analytics:21.3.0")
+    implementation("com.google.firebase:firebase-firestore-ktx:24.6.1")
+
+
 
     // Base
     implementation(libs.androidx.core.ktx)
