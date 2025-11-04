@@ -27,7 +27,7 @@ data class BottomNavItem(
     val matchRoute: String,
     val navigateRoute: String,
     val icon: androidx.compose.ui.graphics.vector.ImageVector,
-    val label: String
+    val label: String,
 )
 
 @Composable
@@ -36,33 +36,37 @@ fun BottomBar(controller: NavHostController) {
 
     NavigationBar(
         containerColor = Color.Transparent,
-        modifier = Modifier.background(
-            Brush.verticalGradient(
-                colors = listOf(
-                    Color(0xFFF8BBD0), // rosa pastel abajo
-                    Color(0xFFE91E63)  // rosa frambuesa arriba
-                )
-            )
-        )
+        modifier =
+            Modifier.background(
+                Brush.verticalGradient(
+                    colors =
+                        listOf(
+                            Color(0xFFF8BBD0), // rosa pastel abajo
+                            Color(0xFFE91E63), // rosa frambuesa arriba
+                        ),
+                ),
+            ),
     ) {
-        val items = listOf(
-            BottomNavItem("home", "home", Icons.Default.Home, "Inicio"),
-            BottomNavItem("map", "map", Icons.Default.Map, "Mapa"),
-            BottomNavItem("user", "user/usuario", Icons.Default.Person, "Perfil")
-        )
+        val items =
+            listOf(
+                BottomNavItem("home", "home", Icons.Default.Home, "Inicio"),
+                BottomNavItem("map", "map", Icons.Default.Map, "Mapa"),
+                BottomNavItem("user", "user/usuario", Icons.Default.Person, "Perfil"),
+            )
 
         items.forEach { item ->
-            val selected = navBackStackEntry?.destination?.hierarchy?.any {
-                it.route?.startsWith(item.matchRoute) == true
-            } == true
+            val selected =
+                navBackStackEntry?.destination?.hierarchy?.any {
+                    it.route?.startsWith(item.matchRoute) == true
+                } == true
 
             val iconColor by animateColorAsState(
-                if (selected) Color.White else Color(0xFFFFCDD2)
+                if (selected) Color.White else Color(0xFFFFCDD2),
             )
             val iconSize by animateDpAsState(if (selected) 32.dp else 24.dp)
             val borderSize by animateDpAsState(if (selected) 2.dp else 0.dp)
             val borderColor by animateColorAsState(
-                if (selected) Color(0xFFF8BBD0) else Color.Transparent
+                if (selected) Color(0xFFF8BBD0) else Color.Transparent,
             )
 
             NavigationBarItem(
@@ -73,20 +77,18 @@ fun BottomBar(controller: NavHostController) {
                         imageVector = item.icon,
                         contentDescription = item.label,
                         tint = iconColor,
-                        modifier = Modifier
-                            .size(iconSize)
-                            .border(
-                                width = borderSize,
-                                color = borderColor,
-                                shape = CircleShape
-                            )
+                        modifier =
+                            Modifier
+                                .size(iconSize)
+                                .border(
+                                    width = borderSize,
+                                    color = borderColor,
+                                    shape = CircleShape,
+                                ),
                     )
                 },
-                alwaysShowLabel = false
+                alwaysShowLabel = false,
             )
         }
     }
 }
-
-
-

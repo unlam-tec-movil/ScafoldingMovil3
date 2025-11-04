@@ -21,13 +21,13 @@ import androidx.compose.ui.graphics.Color
 fun AppTopBar(
     title: String,
     onMenuClick: () -> Unit = {},
-    actions: @Composable RowScope.() -> Unit = {}
+    actions: @Composable RowScope.() -> Unit = {},
 ) {
     CenterAlignedTopAppBar(
         title = {
             Text(
                 text = title,
-                color = Color.White
+                color = Color.White,
             )
         },
         navigationIcon = {
@@ -35,26 +35,26 @@ fun AppTopBar(
                 Icon(
                     imageVector = Icons.Default.Menu,
                     contentDescription = "Menú",
-                    tint = Color.White
+                    tint = Color.White,
                 )
             }
         },
         actions = actions,
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFE91E63), // rosa frambuesa arriba
-                        Color(0xFFF8BBD0)  // rosa pastel abajo
-                    )
-                )
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .background(
+                    Brush.verticalGradient(
+                        colors =
+                            listOf(
+                                Color(0xFFE91E63), // rosa frambuesa arriba
+                                Color(0xFFF8BBD0), // rosa pastel abajo
+                            ),
+                    ),
+                ),
+        colors =
+            TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color.Transparent,
             ),
-        colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-            containerColor = Color.Transparent
-        )
     )
 }
-
-
-

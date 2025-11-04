@@ -26,38 +26,41 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.user.editProfile.EDIT_PROFILE_
 fun UserScreen(
     controller: NavHostController,
     modifier: Modifier = Modifier,
-    viewModel: UserViewModel = hiltViewModel()
+    viewModel: UserViewModel = hiltViewModel(),
 ) {
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(Color(0xFFFCE4EC), Color.White),
-                    startY = 0f,
-                    endY = 1200f
-                )
-            )
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(Color(0xFFFCE4EC), Color.White),
+                        startY = 0f,
+                        endY = 1200f,
+                    ),
+                ),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 80.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(top = 80.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Box(
-                modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(Color.White.copy(alpha = 0.3f))
-                    .shadow(6.dp, CircleShape),
-                contentAlignment = Alignment.Center
+                modifier =
+                    Modifier
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.3f))
+                        .shadow(6.dp, CircleShape),
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = "Avatar",
                     tint = Color(0xFF616161),
-                    modifier = Modifier.size(64.dp)
+                    modifier = Modifier.size(64.dp),
                 )
             }
 
@@ -66,7 +69,7 @@ fun UserScreen(
             Text(
                 text = "Nombre de usuario",
                 fontSize = 22.sp,
-                color = Color(0xFF424242)
+                color = Color(0xFF424242),
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -74,7 +77,7 @@ fun UserScreen(
             Text(
                 text = "usuario@ejemplo.com",
                 fontSize = 16.sp,
-                color = Color(0xFF757575)
+                color = Color(0xFF757575),
             )
         }
 
@@ -82,15 +85,12 @@ fun UserScreen(
             imageVector = Icons.Default.Edit,
             contentDescription = "Editar perfil",
             tint = Color(0xFF616161),
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(16.dp)
-                .size(28.dp)
-                .clickable { controller.navigate(EDIT_PROFILE_ROUTE) }
+            modifier =
+                Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+                    .size(28.dp)
+                    .clickable { controller.navigate(EDIT_PROFILE_ROUTE) },
         )
     }
 }
-
-
-
-
