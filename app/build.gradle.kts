@@ -10,7 +10,7 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose.compiler)
-
+    id ("com.google.gms.google-services")
     //  id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.10"
 
@@ -30,7 +30,7 @@ android {
 
     defaultConfig {
         applicationId = "ar.edu.unlam.mobile.scaffolding"
-        minSdk = 36
+        minSdk = 30
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -67,10 +67,12 @@ android {
 dependencies {
 
 
-   // implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
 
-    implementation("com.google.firebase:firebase-analytics:21.3.0")
-    implementation("com.google.firebase:firebase-firestore-ktx:24.6.1")
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
+
 
 
 
@@ -102,6 +104,10 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.kotlinx.coroutines.android) // o la última
+
+
+
+    implementation(libs.coil.compose)
 
     dependencies {
         // (Opcional) BOM para play-services
