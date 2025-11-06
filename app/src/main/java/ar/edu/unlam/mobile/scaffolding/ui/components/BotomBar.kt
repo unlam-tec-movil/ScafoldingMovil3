@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MAP_ROUTE
 
 data class BottomNavItem(
     val matchRoute: String,
@@ -50,7 +51,7 @@ fun BottomBar(controller: NavHostController) {
         val items =
             listOf(
                 BottomNavItem("home", "home", Icons.Default.Home, "Inicio"),
-                BottomNavItem("map", "map", Icons.Default.Map, "Mapa"),
+                BottomNavItem(MAP_ROUTE, MAP_ROUTE, Icons.Default.Map, "Mapa"),
                 BottomNavItem("user", "user/usuario", Icons.Default.Person, "Perfil"),
             )
 
