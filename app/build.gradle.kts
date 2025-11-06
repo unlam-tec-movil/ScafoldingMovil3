@@ -97,9 +97,13 @@ dependencies {
 
     // ========== COROUTINES ==========
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
 
     // ========== IMAGE LOADING ==========
     implementation(libs.coil.compose)
+
+    // ========== ACCOMPANIST ==========
+    implementation(libs.accompanist.permissions)
 
     // ========== TESTING ==========
     testImplementation(libs.junit)

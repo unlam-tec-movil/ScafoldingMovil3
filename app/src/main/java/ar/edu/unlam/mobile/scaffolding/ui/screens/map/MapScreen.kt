@@ -1,25 +1,14 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens.map
 
-import android.content.pm.PackageManager
-import android.location.Location
-import android.os.Build
-import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
-import androidx.annotation.RequiresApi
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,21 +16,17 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import ar.edu.unlam.mobile.scaffolding.data.datasources.network.PinStorage
-import ar.edu.unlam.mobile.scaffolding.data.models.PlacePin
 import ar.edu.unlam.mobile.scaffolding.ui.components.AddPinDialog
-import ar.edu.unlam.mobile.scaffolding.util.awaitCatching
-import com.google.android.gms.location.LocationServices
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -49,159 +34,200 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerInfoWindowContent
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
-import com.google.maps.android.compose.rememberMarkerState
 
 const val MAP_ROUTE = "map"
 
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+/**
+ * Pantalla del mapa con ubicación del usuario y gestión de pins.
+ * Observa estados del MapViewModel (StateFlow).
+ * Arquitectura limpia: usa Pin del dominio y PinRepository.
+ */
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
-fun MapScreen(viewmodel: MapViewModel = hiltViewModel()) {
+fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val pins by viewmodel.pins.collectAsState()
-    val pending by viewmodel.pendingLatLng.collectAsState()
 
+    // ===== OBSERVAR ESTADOS DEL VIEWMODEL =====
+    val currentLocation by viewModel.currentLocation.collectAsState()
+    val isLoadingLocation by viewModel.isLoadingLocation.collectAsState()
+    val pins by viewModel.pins.collectAsState()
+
+    // ===== MANEJO DE PERMISOS CON ACCOMPANIST =====
+    val locationPermissionState = rememberPermissionState(
+        android.Manifest.permission.ACCESS_FINE_LOCATION
+    )
+
+    // Estado para detectar si es la primera carga (evita mostrar mensaje antes del diálogo)
+    var isFirstLoad by remember { mutableStateOf(true) }
+
+    // ===== PEDIR PERMISO AUTOMÁTICAMENTE AL ENTRAR =====
     LaunchedEffect(Unit) {
-        val saved = PinStorage.load(context)
-        viewmodel.setAll(saved)
-    }
-
-    LaunchedEffect(pins) {
-        PinStorage.save(context, pins)
-    }
-
-    val hasLocationPermission by remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                android.Manifest.permission.ACCESS_FINE_LOCATION,
-            ) == PackageManager.PERMISSION_GRANTED,
-        )
-    }
-
-    if (!hasLocationPermission) {
-        RequestLocationPermission()
-    }
-
-    val cameraPositionState =
-        rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(LatLng(1.0, -58.791), 13f) // Moreno pa
+        if (!locationPermissionState.status.isGranted) {
+            locationPermissionState.launchPermissionRequest()
+            isFirstLoad = false // Ya se pidió el permiso
         }
+    }
 
-    var deleteCandidate by remember { mutableStateOf<PlacePin?>(null) }
+    // ===== GESTIÓN DE PINS =====
+    var pendingLatLng by remember { mutableStateOf<LatLng?>(null) }
     var title by remember { mutableStateOf("") }
     var snippet by remember { mutableStateOf("") }
 
-    LaunchedEffect(hasLocationPermission) {
-        if (hasLocationPermission) {
-            val fused = LocationServices.getFusedLocationProviderClient(context)
+    // Cargar pins desde el ViewModel al entrar
+    LaunchedEffect(Unit) {
+        viewModel.loadPins()
+    }
 
-            val loc: Location? = fused.lastLocation.awaitCatching()
-            loc?.let {
-                val here = LatLng(it.latitude, it.longitude)
-                cameraPositionState.animate(
-                    update = CameraUpdateFactory.newLatLngZoom(here, 15f),
-                    durationMs = 800,
-                )
-            }
+    // ========== NOTIFICAR AL VIEWMODEL SOBRE CAMBIOS DE PERMISO ==========
+    LaunchedEffect(locationPermissionState.status.isGranted) {
+        viewModel.onLocationPermissionChanged(locationPermissionState.status.isGranted)
+
+        // Si se concede el permiso, cargar ubicación
+        if (locationPermissionState.status.isGranted) {
+            viewModel.loadCurrentLocation()
         }
     }
 
-    GoogleMap(
-        modifier = Modifier.fillMaxSize(),
-        cameraPositionState = cameraPositionState,
-        properties =
-            MapProperties(
-                isMyLocationEnabled = hasLocationPermission,
-            ),
-        onMapLongClick = { latLng ->
-            viewmodel.askAddAt(latLng)
-            title = ""
-            snippet = ""
-        },
-        uiSettings =
-            MapUiSettings(
-                myLocationButtonEnabled = true,
-                zoomControlsEnabled = false,
-                compassEnabled = true,
-            ),
-    ) {
-        MarkerInfoWindowContent(
-            state = rememberMarkerState(position = LatLng(-34.653, -58.791)),
-            title = "perros",
-            onClick = { false },
-        ) { marker ->
-            Card(
-                modifier = Modifier.width(220.dp),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-            ) {
-                Column(Modifier.padding(12.dp)) {
-                    coil.compose.AsyncImage(
-                        model =
-                            "https://www.google.com/url?sa=i&url=https%3A%2F%2Fben10.fandom.com" +
-                                "%2Fes%2Fwiki%2FHighbreed&psig=AOvVaw3QIPq5y6onrTDqxijv5JsC&ust=1761415939421000" +
-                                "&source=images&cd=vfe&opi=89978449&ved=0CBUQjRxqFwoTCOjrwc_AvZADFQAAAAAdAAAAABAE",
-                        contentDescription = null,
-                        modifier =
-                            Modifier
-                                .fillMaxWidth()
-                                .height(120.dp)
-                                .clip(RoundedCornerShape(12.dp)),
-                        contentScale = ContentScale.Crop,
-                    )
-                    Spacer(Modifier.height(8.dp))
-                    Text(marker.title ?: "Sin título", style = MaterialTheme.typography.titleMedium)
-                }
-            }
-        }
+    // ========== CONFIGURACIÓN DE LA CÁMARA ==========
+    val cameraPositionState = rememberCameraPositionState {
+        // Posición inicial: Buenos Aires (si no hay ubicación)
+        position = CameraPosition.fromLatLngZoom(LatLng(-34.603722, -58.381592), 13f)
+    }
 
-        pins.forEach { pin ->
-            Marker(
-                state = MarkerState(LatLng(pin.lat, pin.lng)),
-                title = pin.title,
-                snippet = pin.snippet,
-                draggable = true,
-                onClick = {
-                    deleteCandidate = pin
-                    true
-                },
-                onInfoWindowLongClick = {
-                    Toast.makeText(context, "Funca", Toast.LENGTH_SHORT).show()
-                },
+    // ========== ANIMAR CÁMARA CUANDO LLEGA LA UBICACIÓN ==========
+    LaunchedEffect(currentLocation) {
+        currentLocation?.let { location ->
+            val latLng = LatLng(location.latitude, location.longitude)
+            cameraPositionState.animate(
+                update = CameraUpdateFactory.newLatLngZoom(latLng, 15f),
+                durationMs = 800
             )
         }
     }
 
-    if (pending != null) {
+    // ========== UI: MANEJAR ESTADO DEL PERMISO ==========
+    when (val status = locationPermissionState.status) {
+        is PermissionStatus.Denied -> {
+            // Si es la primera carga, mostrar loading (no el mensaje)
+            // Esto evita el "flash" del mensaje antes de que aparezca el diálogo del sistema
+            if (isFirstLoad) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+                return
+            }
+
+            // Si ya no es primera carga (usuario rechazó), mostrar mensaje explicativo
+            val isBlocked = !status.shouldShowRationale
+
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text(
+                        text = if (isBlocked) {
+                            "Permiso de ubicación bloqueado.\nVe a Configuración para habilitarlo."
+                        } else {
+                            "Esta app necesita tu ubicación\npara mostrarte mascotas perdidas cerca de ti."
+                        },
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+
+                    Button(
+                        onClick = {
+                            if (isBlocked) {
+                                // Abrir configuración de la app
+                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                    data = Uri.fromParts("package", context.packageName, null)
+                                }
+                                context.startActivity(intent)
+                            } else {
+                                // Volver a pedir el permiso
+                                locationPermissionState.launchPermissionRequest()
+                            }
+                        },
+                        modifier = Modifier.padding(top = 16.dp)
+                    ) {
+                        Text(if (isBlocked) "Abrir Configuración" else "Conceder permiso")
+                    }
+                }
+            }
+            return // No mostrar el mapa hasta que haya permiso
+        }
+        is PermissionStatus.Granted -> {
+            // Permiso concedido, continuar con el mapa (código abajo)
+        }
+    }
+
+    // ========== UI: MAPA CON LOADING ==========
+    Box(modifier = Modifier.fillMaxSize()) {
+        // Mapa de Google
+        GoogleMap(
+            modifier = Modifier.fillMaxSize(),
+            cameraPositionState = cameraPositionState,
+            properties = MapProperties(
+                isMyLocationEnabled = true // Punto azul del usuario
+            ),
+            uiSettings = MapUiSettings(
+                myLocationButtonEnabled = true, // Botón para centrar
+                zoomControlsEnabled = false,
+                compassEnabled = true
+            ),
+            onMapLongClick = { latLng ->
+                // Abrir diálogo para agregar un nuevo pin
+                pendingLatLng = latLng
+                title = ""
+                snippet = ""
+            }
+        ) {
+            // Renderizar pins (Observa desde ViewModel, usa modelo Pin del dominio)
+            pins.forEach { pin ->
+                Marker(
+                    state = MarkerState(LatLng(pin.latitude, pin.longitude)),
+                    title = pin.title,
+                    snippet = pin.description,
+                    draggable = true
+                )
+            }
+        }
+
+        // Indicador de carga (observa ViewModel)
+        if (isLoadingLocation) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(16.dp)
+            )
+        }
+    }
+
+    // ========== DIÁLOGO PARA AGREGAR PIN ==========
+    if (pendingLatLng != null) {
         AddPinDialog(
             title = title,
             onTitleChange = { title = it },
             snippet = snippet,
             onSnippetChange = { snippet = it },
             onConfirm = {
-                viewmodel.confirmAdd(title.ifBlank { "Marcador" }, snippet.ifBlank { null })
+                // La UI solo pasa los datos.
+                viewModel.savePin(
+                    latitude = pendingLatLng!!.latitude,
+                    longitude = pendingLatLng!!.longitude,
+                    title = title.ifBlank { "Marcador" },
+                    description = snippet.ifBlank { null }
+                )
+                pendingLatLng = null
             },
-            onDismiss = { viewmodel.cancelAdd() },
+            onDismiss = { pendingLatLng = null }
         )
-    }
-}
-
-@Composable
-fun RequestLocationPermission() {
-    val permissionLauncher =
-        rememberLauncherForActivityResult(
-            contract = RequestPermission(),
-        ) {}
-    Box(Modifier.fillMaxSize()) {
-        Button(
-            modifier = Modifier.align(Alignment.Center),
-            onClick = {
-                permissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION)
-            },
-        ) { Text("Solicitar Permiso de Ubicacion") }
     }
 }

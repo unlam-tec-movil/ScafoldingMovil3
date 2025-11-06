@@ -41,6 +41,7 @@ import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
 import ar.edu.unlam.mobile.scaffolding.ui.screens.home.HOME_SCREEN_ROUTE
 import ar.edu.unlam.mobile.scaffolding.ui.screens.home.HomeScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MAP_ROUTE
 import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.editProfile.EditProfile
@@ -174,7 +175,7 @@ fun MainScreen() {
                 HomeScreen(modifier = Modifier.padding(paddingValue))
             }
 
-            composable("map") {
+            composable(MAP_ROUTE) {
                 MapScreen()
             }
 
