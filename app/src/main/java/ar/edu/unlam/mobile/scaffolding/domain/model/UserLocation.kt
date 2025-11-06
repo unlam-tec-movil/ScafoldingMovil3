@@ -6,5 +6,5 @@ package ar.edu.unlam.mobile.scaffolding.domain.model
  */
 data class UserLocation(
     val latitude: Double,
-    val longitude: Double
+    val longitude: Double,
 )

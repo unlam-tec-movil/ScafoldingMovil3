@@ -10,59 +10,57 @@ import javax.inject.Inject
 /**
  * Implementación del repositorio de Pins.
  */
-class PinRepositoryImpl @Inject constructor(
-    private val pinLocalDataSource: PinLocalDataSource
-) : PinRepository {
-
-    /**
-     * Obtiene todos los pins guardados.
-     */
-    override suspend fun getAllPins(): Result<List<Pin>> {
-        return try {
-            val placePins = pinLocalDataSource.getAllPins()
-            val domainPins = placePins.map { it.toDomain() }
-            Result.success(domainPins)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    /**
-     * Guarda un nuevo pin.
-     */
-    override suspend fun savePin(pin: Pin): Result<Unit> {
-        return try {
-            val currentPins = pinLocalDataSource.getAllPins().toMutableList()
-            val newPlacePin = pin.toData()
-            currentPins.add(newPlacePin)
-
-            val success = pinLocalDataSource.savePins(currentPins)
-            if (success) {
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("No se pudo guardar el pin"))
+class PinRepositoryImpl
+    @Inject
+    constructor(
+        private val pinLocalDataSource: PinLocalDataSource,
+    ) : PinRepository {
+        /**
+         * Obtiene todos los pins guardados.
+         */
+        override suspend fun getAllPins(): Result<List<Pin>> =
+            try {
+                val placePins = pinLocalDataSource.getAllPins()
+                val domainPins = placePins.map { it.toDomain() }
+                Result.success(domainPins)
+            } catch (e: Exception) {
+                Result.failure(e)
             }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
 
-    /**
-     * Elimina un pin por su ID.
-     */
-    override suspend fun deletePin(pinId: String): Result<Unit> {
-        return try {
-            val currentPins = pinLocalDataSource.getAllPins()
-            val updatedPins = currentPins.filter { it.id != pinId }
+        /**
+         * Guarda un nuevo pin.
+         */
+        override suspend fun savePin(pin: Pin): Result<Unit> =
+            try {
+                val currentPins = pinLocalDataSource.getAllPins().toMutableList()
+                val newPlacePin = pin.toData()
+                currentPins.add(newPlacePin)
 
-            val success = pinLocalDataSource.savePins(updatedPins)
-            if (success) {
-                Result.success(Unit)
-            } else {
-                Result.failure(Exception("No se pudo eliminar el pin"))
+                val success = pinLocalDataSource.savePins(currentPins)
+                if (success) {
+                    Result.success(Unit)
+                } else {
+                    Result.failure(Exception("No se pudo guardar el pin"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
             }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+
+        /**
+         * Elimina un pin por su ID.
+         */
+        override suspend fun deletePin(pinId: String): Result<Unit> =
+            try {
+                val currentPins = pinLocalDataSource.getAllPins()
+                val updatedPins = currentPins.filter { it.id != pinId }
+
+                val success = pinLocalDataSource.savePins(updatedPins)
+                if (success) {
+                    Result.success(Unit)
+                } else {
+                    Result.failure(Exception("No se pudo eliminar el pin"))
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
     }
-}

@@ -55,9 +55,10 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val pins by viewModel.pins.collectAsState()
 
     // ===== MANEJO DE PERMISOS CON ACCOMPANIST =====
-    val locationPermissionState = rememberPermissionState(
-        android.Manifest.permission.ACCESS_FINE_LOCATION
-    )
+    val locationPermissionState =
+        rememberPermissionState(
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+        )
 
     // Estado para detectar si es la primera carga (evita mostrar mensaje antes del diálogo)
     var isFirstLoad by remember { mutableStateOf(true) }
@@ -91,10 +92,11 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     }
 
     // ========== CONFIGURACIÓN DE LA CÁMARA ==========
-    val cameraPositionState = rememberCameraPositionState {
-        // Posición inicial: Buenos Aires (si no hay ubicación)
-        position = CameraPosition.fromLatLngZoom(LatLng(-34.603722, -58.381592), 13f)
-    }
+    val cameraPositionState =
+        rememberCameraPositionState {
+            // Posición inicial: Buenos Aires (si no hay ubicación)
+            position = CameraPosition.fromLatLngZoom(LatLng(-34.603722, -58.381592), 13f)
+        }
 
     // ========== ANIMAR CÁMARA CUANDO LLEGA LA UBICACIÓN ==========
     LaunchedEffect(currentLocation) {
@@ -102,7 +104,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             val latLng = LatLng(location.latitude, location.longitude)
             cameraPositionState.animate(
                 update = CameraUpdateFactory.newLatLngZoom(latLng, 15f),
-                durationMs = 800
+                durationMs = 800,
             )
         }
     }
@@ -115,7 +117,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             if (isFirstLoad) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator()
                 }
@@ -127,35 +129,37 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
             Box(
                 modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier.padding(16.dp),
                 ) {
                     Text(
-                        text = if (isBlocked) {
-                            "Permiso de ubicación bloqueado.\nVe a Configuración para habilitarlo."
-                        } else {
-                            "Esta app necesita tu ubicación\npara mostrarte mascotas perdidas cerca de ti."
-                        },
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                        text =
+                            if (isBlocked) {
+                                "Permiso de ubicación bloqueado.\nVe a Configuración para habilitarlo."
+                            } else {
+                                "Esta app necesita tu ubicación\npara mostrarte mascotas perdidas cerca de ti."
+                            },
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
                     )
 
                     Button(
                         onClick = {
                             if (isBlocked) {
                                 // Abrir configuración de la app
-                                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                    data = Uri.fromParts("package", context.packageName, null)
-                                }
+                                val intent =
+                                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                                        data = Uri.fromParts("package", context.packageName, null)
+                                    }
                                 context.startActivity(intent)
                             } else {
                                 // Volver a pedir el permiso
                                 locationPermissionState.launchPermissionRequest()
                             }
                         },
-                        modifier = Modifier.padding(top = 16.dp)
+                        modifier = Modifier.padding(top = 16.dp),
                     ) {
                         Text(if (isBlocked) "Abrir Configuración" else "Conceder permiso")
                     }
@@ -174,20 +178,22 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
-            properties = MapProperties(
-                isMyLocationEnabled = true // Punto azul del usuario
-            ),
-            uiSettings = MapUiSettings(
-                myLocationButtonEnabled = true, // Botón para centrar
-                zoomControlsEnabled = false,
-                compassEnabled = true
-            ),
+            properties =
+                MapProperties(
+                    isMyLocationEnabled = true, // Punto azul del usuario
+                ),
+            uiSettings =
+                MapUiSettings(
+                    myLocationButtonEnabled = true, // Botón para centrar
+                    zoomControlsEnabled = false,
+                    compassEnabled = true,
+                ),
             onMapLongClick = { latLng ->
                 // Abrir diálogo para agregar un nuevo pin
                 pendingLatLng = latLng
                 title = ""
                 snippet = ""
-            }
+            },
         ) {
             // Renderizar pins (Observa desde ViewModel, usa modelo Pin del dominio)
             pins.forEach { pin ->
@@ -195,7 +201,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     state = MarkerState(LatLng(pin.latitude, pin.longitude)),
                     title = pin.title,
                     snippet = pin.description,
-                    draggable = true
+                    draggable = true,
                 )
             }
         }
@@ -203,9 +209,10 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         // Indicador de carga (observa ViewModel)
         if (isLoadingLocation) {
             CircularProgressIndicator(
-                modifier = Modifier
-                    .align(Alignment.Center)
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .align(Alignment.Center)
+                        .padding(16.dp),
             )
         }
     }
@@ -223,11 +230,11 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     latitude = pendingLatLng!!.latitude,
                     longitude = pendingLatLng!!.longitude,
                     title = title.ifBlank { "Marcador" },
-                    description = snippet.ifBlank { null }
+                    description = snippet.ifBlank { null },
                 )
                 pendingLatLng = null
             },
-            onDismiss = { pendingLatLng = null }
+            onDismiss = { pendingLatLng = null },
         )
     }
 }

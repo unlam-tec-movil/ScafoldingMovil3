@@ -7,10 +7,8 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.UserLocation
  * Este mapper traduce Location (de Google Play Services)
  * a UserLocation (que es el modelo de dominio de la app).
  */
-
-fun Location.toDomain(): UserLocation {
-    return UserLocation(
+fun Location.toDomain(): UserLocation =
+    UserLocation(
         latitude = this.latitude,
-        longitude = this.longitude
+        longitude = this.longitude,
     )
-}

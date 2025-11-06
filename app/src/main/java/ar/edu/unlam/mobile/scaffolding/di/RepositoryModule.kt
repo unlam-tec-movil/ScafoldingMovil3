@@ -23,16 +23,12 @@ abstract class RepositoryModule {
      */
     @Binds
     @Singleton
-    abstract fun bindLocationRepository(
-        impl: LocationRepositoryImpl
-    ): LocationRepository
+    abstract fun bindLocationRepository(impl: LocationRepositoryImpl): LocationRepository
 
     /**
      * Conecta PinRepository (interface) con PinRepositoryImpl (implementación).
      */
     @Binds
     @Singleton
-    abstract fun bindPinRepository(
-        impl: PinRepositoryImpl
-    ): PinRepository
+    abstract fun bindPinRepository(impl: PinRepositoryImpl): PinRepository
 }

@@ -23,34 +23,34 @@ private val PINS_JSON_KEY = stringPreferencesKey("pins_json")
  * - Serialización/Deserialización JSON
  * - Operaciones de lectura/escritura
  */
-class PinLocalDataSource @Inject constructor(
-    @ApplicationContext private val context: Context
-) {
-    /**
-     * Obtiene todos los pins guardados en DataStore.
-     */
-    suspend fun getAllPins(): List<PlacePin> {
-        return try {
-            val prefs = context.pinsDataStore.data.first()
-            val jsonString = prefs[PINS_JSON_KEY] ?: "[]"
-            Json.decodeFromString<List<PlacePin>>(jsonString)
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
-
-    /**
-     * Guarda una lista de pins en DataStore.
-     */
-    suspend fun savePins(pins: List<PlacePin>): Boolean {
-        return try {
-            val jsonString = Json.encodeToString(pins)
-            context.pinsDataStore.edit { preferences ->
-                preferences[PINS_JSON_KEY] = jsonString
+class PinLocalDataSource
+    @Inject
+    constructor(
+        @ApplicationContext private val context: Context,
+    ) {
+        /**
+         * Obtiene todos los pins guardados en DataStore.
+         */
+        suspend fun getAllPins(): List<PlacePin> =
+            try {
+                val prefs = context.pinsDataStore.data.first()
+                val jsonString = prefs[PINS_JSON_KEY] ?: "[]"
+                Json.decodeFromString<List<PlacePin>>(jsonString)
+            } catch (e: Exception) {
+                emptyList()
             }
-            true
-        } catch (e: Exception) {
-            false
-        }
+
+        /**
+         * Guarda una lista de pins en DataStore.
+         */
+        suspend fun savePins(pins: List<PlacePin>): Boolean =
+            try {
+                val jsonString = Json.encodeToString(pins)
+                context.pinsDataStore.edit { preferences ->
+                    preferences[PINS_JSON_KEY] = jsonString
+                }
+                true
+            } catch (e: Exception) {
+                false
+            }
     }
-}
