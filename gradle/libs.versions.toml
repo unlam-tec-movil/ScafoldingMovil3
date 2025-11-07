@@ -11,6 +11,7 @@ junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 kotlinxCoroutinesAndroid = "1.9.0"
+kotlinxCoroutinesPlayServices = "1.9.0"
 kotlinxSerializationJson = "1.7.3"
 lifecycleRuntimeKtx = "2.9.2"
 activityCompose = "1.10.1"
@@ -20,8 +21,14 @@ ksp = "2.2.10-2.0.2"
 androidXHilt = "1.2.0"
 kover = "0.9.1"
 ktlint = "13.0.0"
-material3 = "1.4.0-beta03"
-playServicesBomVersion = "17.1.0"
+material3 = "1.4.0"
+playServicesMaps = "18.2.0"
+playServicesLocation = "21.3.0"
+mapsCompose = "6.1.0"
+navigationCompose = "2.8.5"
+datastorePreferences = "1.1.1"
+coilCompose = "2.6.0"
+accompanistPermissions = "0.34.0"
 
 
 
@@ -51,8 +58,25 @@ google-dagger-hilt-android = { group = "com.google.dagger", name = "hilt-android
 google-dagger-hilt-android-compiler = { group = "com.google.dagger", name = "hilt-android-compiler", version.ref = "dagger" }
 google-dagger-hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "dagger" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
+kotlinx-coroutines-play-services = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutinesPlayServices" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-play-services-bom = { module = "com.google.android.gms:play-services-bom", version.ref = "playServicesBomVersion" }
+
+# Google Play Services
+play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMaps" }
+play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
+maps-compose = { module = "com.google.maps.android:maps-compose", version.ref = "mapsCompose" }
+
+# Navigation
+androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
+
+# Persistencia
+androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
+
+# Image Loading
+coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
+
+# Accompanist
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 
 
 [plugins]
