@@ -41,9 +41,10 @@ private val LightColorScheme =
      */
     )
 
-val PetFinderFont = FontFamily(
-    Font(R.font.font_pet_finder)
-)
+val PetFinderFont =
+    FontFamily(
+        Font(R.font.font_pet_finder),
+    )
 
 @Composable
 fun ScaffoldingV2Theme(

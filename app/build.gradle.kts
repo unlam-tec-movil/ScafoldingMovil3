@@ -10,10 +10,9 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose.compiler)
-    id ("com.google.gms.google-services")
+    id("com.google.gms.google-services")
     //  id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.10"
-
 }
 
 tasks.withType<KotlinCompile>().configureEach {
@@ -66,15 +65,13 @@ android {
 
 dependencies {
 
-
+    // FIREBASE
     implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
 
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-storage-ktx")
-
-
-
+    implementation("com.google.firebase:firebase-auth-ktx")
 
     // Base
     implementation(libs.androidx.core.ktx)
@@ -93,6 +90,7 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.androidx.core.splashscreen)
 
     // Dagger + Hilt
     implementation(libs.google.dagger.hilt.android)
@@ -104,8 +102,6 @@ dependencies {
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.fragment.ktx)
     implementation(libs.kotlinx.coroutines.android) // o la última
-
-
 
     implementation(libs.coil.compose)
 

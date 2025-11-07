@@ -1,7 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.data.models
 
-
-//Esto sería la info de los posts.
+// Esto sería la info de los posts.
 data class Pet(
     val id: String = "",
     val name: String = "",
@@ -10,33 +9,30 @@ data class Pet(
     val gender: Gender = Gender.MALE,
     val seenAt: String = "",
     val locality: String = "",
-    val imageUrl: String = ""
+    val imageUrl: String = "",
 )
 
-
-
-
-//data class Status(
+// data class Status(
 //    val description: String,
 //    val id: Integer,
-//)
+// )
 //
-//data class Type(
+// data class Type(
 //    val name: String,
 //    val id: Integer,
-//)
+// )
 
-//data class Color(
+// data class Color(
 //    val name: String,
 //    val id: Integer,
-//)
+// )
 //
-//data class Hair(
+// data class Hair(
 //    val name: String,
 //    val id: Integer,
-//)
+// )
 //
-//data class gender(
+// data class gender(
 //    val description: String,
 //    val id: Integer,
-//)
+// )
