@@ -11,7 +11,6 @@ plugins {
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose.compiler)
     id("com.google.gms.google-services")
-    //  id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.10"
 }
 
@@ -74,9 +73,14 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx")
 
     // Base
+    // ========== BASE ANDROID ==========
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
+
+    // ========== COMPOSE ==========
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
@@ -92,41 +96,46 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation(libs.androidx.core.splashscreen)
 
-    // Dagger + Hilt
+    // ========== NAVIGATION ==========
+    implementation(libs.androidx.navigation.compose)
+
+    // ========== DAGGER HILT ==========
     implementation(libs.google.dagger.hilt.android)
     ksp(libs.google.dagger.hilt.android.compiler)
-    implementation(libs.google.dagger.hilt.android.testing)
     implementation(libs.androidx.hilt.navigation.compose)
-    androidTestImplementation(libs.google.dagger.hilt.android.testing)
-    testImplementation(libs.google.dagger.hilt.android.testing)
-    implementation(libs.androidx.activity.ktx)
-    implementation(libs.androidx.fragment.ktx)
-    implementation(libs.kotlinx.coroutines.android) // o la última
 
     implementation(libs.coil.compose)
 
-    dependencies {
-        // (Opcional) BOM para play-services
+    // ========== GOOGLE MAPS & LOCATION ==========
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
+    implementation(libs.maps.compose)
 
-        // Google Maps y Fused Location (versiones vienen del BOM)
-        implementation("com.google.android.gms:play-services-maps")
-        implementation("com.google.android.gms:play-services-location:17.0.0")
 
-        // *** Maps Compose (NO usa el BOM; requiere versión explícita) ***
-        implementation("com.google.maps.android:maps-compose:6.1.0")
+    // ========== PERSISTENCIA ==========
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.serialization.json)
 
-        // DataStore
-        implementation("androidx.datastore:datastore-preferences:1.1.1")
-        implementation(libs.kotlinx.serialization.json)
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    // ========== COROUTINES ==========
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
 
-        // Maps Compose
-        implementation("com.google.maps.android:maps-compose:4.0.1") // o la que estés usando
+    // ========== IMAGE LOADING ==========
+    implementation(libs.coil.compose)
 
-        // Asegura el artefacto base donde está BitmapDescriptor
-        implementation("com.google.android.gms:play-services-maps:18.2.0")
+    // ========== ACCOMPANIST ==========
+    implementation(libs.accompanist.permissions)
 
-        // coil
-        implementation("io.coil-kt:coil-compose:2.6.0")
-    }
+    // ========== TESTING ==========
+    testImplementation(libs.junit)
+    testImplementation(libs.google.dagger.hilt.android.testing)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.google.dagger.hilt.android.testing)
+
+    // ========== DEBUG ==========
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 }

@@ -6,11 +6,20 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -21,10 +30,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import ar.edu.unlam.mobile.scaffolding.ui.components.AppTopBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.screens.LoginScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.RegisterScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.feed.FeedScreen
+import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
+import ar.edu.unlam.mobile.scaffolding.ui.screens.home.HOME_SCREEN_ROUTE
+import ar.edu.unlam.mobile.scaffolding.ui.screens.home.HomeScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MAP_ROUTE
 import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
@@ -110,7 +124,7 @@ fun MainScreen() {
                 FeedScreen()
             }
 
-            composable("map") {
+            composable(MAP_ROUTE) {
                 MapScreen()
             }
 
@@ -121,8 +135,12 @@ fun MainScreen() {
             composable(
                 "user/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) {
-                UserScreen(controller)
+            ) { navBackStackEntry ->
+                val id = navBackStackEntry.arguments?.getString("id") ?: "1"
+                UserScreen(
+                    controller = controller,
+                    modifier = Modifier.padding(paddingValue),
+                )
             }
         }
     }
@@ -139,23 +157,6 @@ fun AppNavHost() {
         navController = nav,
         startDestination = startDestination,
     ) {
-//
-//        composable("splash") {
-//            Splash(
-//                onFinish = {
-//                    val next = if (FirebaseAuth.getInstance().currentUser != null) {
-//                        "main"
-//                    } else {
-//                        "login"
-//                    }
-//
-//                    nav.navigate(next) {
-//                        popUpTo("splash") { inclusive = true }
-//                    }
-//                }
-//            )
-//        }
-
         composable("login") {
             LoginScreen(
                 onRegisterClick = { nav.navigate("register") },
