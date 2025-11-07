@@ -43,6 +43,10 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.home.HOME_SCREEN_ROUTE
 import ar.edu.unlam.mobile.scaffolding.ui.screens.home.HomeScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MAP_ROUTE
 import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.petdetail.PET_DETAIL_ROUTE
+import ar.edu.unlam.mobile.scaffolding.ui.screens.petdetail.PetDetailScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.search.SEARCH_ROUTE
+import ar.edu.unlam.mobile.scaffolding.ui.screens.search.SearchScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.editProfile.EditProfile
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ScaffoldingV2Theme
@@ -191,6 +195,27 @@ fun MainScreen() {
             }
             composable("edit") {
                 EditProfile(controller)
+            }
+
+            // ===== RUTA: PET DETAIL =====
+            composable(
+                route = "$PET_DETAIL_ROUTE/{petId}",
+                arguments = listOf(navArgument("petId") { type = NavType.StringType }),
+            ) { navBackStackEntry ->
+                val petId = navBackStackEntry.arguments?.getString("petId") ?: ""
+                PetDetailScreen(
+                    petId = petId,
+                    navController = controller,
+                )
+            }
+
+            // ===== RUTA: SEARCH =====
+            composable(
+                route = "$SEARCH_ROUTE/{petId}",
+                arguments = listOf(navArgument("petId") { type = NavType.StringType }),
+            ) { navBackStackEntry ->
+                val petId = navBackStackEntry.arguments?.getString("petId") ?: ""
+                SearchScreen(petId = petId)
             }
         }
     }

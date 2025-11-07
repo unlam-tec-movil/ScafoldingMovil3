@@ -2,8 +2,10 @@ package ar.edu.unlam.mobile.scaffolding.di
 
 import ar.edu.unlam.mobile.scaffolding.data.repository.LocationRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repository.PinRepositoryImpl
+import ar.edu.unlam.mobile.scaffolding.data.repository.SensorRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.domain.repository.LocationRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.PinRepository
+import ar.edu.unlam.mobile.scaffolding.domain.repository.SensorRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -31,4 +33,11 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPinRepository(impl: PinRepositoryImpl): PinRepository
+
+    /**
+     * Conecta SensorRepository (interface) con SensorRepositoryImpl (implementación).
+     */
+    @Binds
+    @Singleton
+    abstract fun bindSensorRepository(impl: SensorRepositoryImpl): SensorRepository
 }
