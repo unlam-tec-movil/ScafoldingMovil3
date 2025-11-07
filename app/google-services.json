@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "155144848105",
+    "project_id": "petfindermovil3",
+    "storage_bucket": "petfindermovil3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:155144848105:android:e7386e44f9ff016a512678",
+        "android_client_info": {
+          "package_name": "ar.edu.unlam.mobile.scaffolding"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCYkU4SwjhMCx1wd5YfzvgC7W7yF8TPed8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

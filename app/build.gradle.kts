@@ -10,6 +10,8 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose.compiler)
+    id("com.google.gms.google-services")
+    //  id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization") version "2.2.10"
 }
 
@@ -27,7 +29,7 @@ android {
 
     defaultConfig {
         applicationId = "ar.edu.unlam.mobile.scaffolding"
-        minSdk = 24
+        minSdk = 30
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -63,6 +65,14 @@ android {
 
 dependencies {
 
+    // FIREBASE
+    implementation(platform("com.google.firebase:firebase-bom:33.2.0"))
+
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("com.google.firebase:firebase-auth-ktx")
+
     // ========== BASE ANDROID ==========
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -84,8 +94,15 @@ dependencies {
     // ========== DAGGER HILT ==========
     implementation(libs.google.dagger.hilt.android)
     ksp(libs.google.dagger.hilt.android.compiler)
+    implementation(libs.google.dagger.hilt.android.testing)
     implementation(libs.androidx.hilt.navigation.compose)
+    androidTestImplementation(libs.google.dagger.hilt.android.testing)
+    testImplementation(libs.google.dagger.hilt.android.testing)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.kotlinx.coroutines.android) // o la última
 
+    implementation(libs.coil.compose)
     // ========== GOOGLE MAPS & LOCATION ==========
     implementation(libs.play.services.maps)
     implementation(libs.play.services.location)
@@ -104,7 +121,6 @@ dependencies {
 
     // ========== ACCOMPANIST ==========
     implementation(libs.accompanist.permissions)
-
     // ========== TESTING ==========
     testImplementation(libs.junit)
     testImplementation(libs.google.dagger.hilt.android.testing)
@@ -117,4 +133,7 @@ dependencies {
     // ========== DEBUG ==========
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    // splash
+    implementation(libs.androidx.core.splashscreen.v101)
 }
