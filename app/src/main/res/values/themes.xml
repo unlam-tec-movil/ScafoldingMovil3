@@ -8,6 +8,5 @@
         <item name="windowSplashScreenAnimatedIcon">@drawable/splash_logo</item>
         <item name="windowSplashScreenAnimationDuration">300</item>
         <item name="postSplashScreenTheme">@style/Theme.ScaffoldingV2</item>
-
     </style>
 </resources>
