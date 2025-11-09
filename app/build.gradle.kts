@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.kover)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.kotlin.compose.compiler)
+    id("org.jetbrains.kotlin.plugin.serialization") version "2.2.10"
 }
 
 tasks.withType<KotlinCompile>().configureEach {
@@ -62,29 +63,61 @@ android {
 
 dependencies {
 
-    // Base
+    // ========== BASE ANDROID ==========
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.fragment.ktx)
+
+    // ========== COMPOSE ==========
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icon)
+
+    // ========== NAVIGATION ==========
+    implementation(libs.androidx.navigation.compose)
+
+    // ========== DAGGER HILT ==========
+    implementation(libs.google.dagger.hilt.android)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidbrowserhelper)
+    ksp(libs.google.dagger.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
+    // ========== GOOGLE MAPS & LOCATION ==========
+    implementation(libs.play.services.maps)
+    implementation(libs.play.services.location)
+    implementation(libs.maps.compose)
+
+    // ========== PERSISTENCIA ==========
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.kotlinx.serialization.json)
+
+    // ========== COROUTINES ==========
+    implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.coroutines.play.services)
+
+    // ========== IMAGE LOADING ==========
+    implementation(libs.coil.compose)
+
+    // ========== ACCOMPANIST ==========
+    implementation(libs.accompanist.permissions)
+
+    // ========== TESTING ==========
     testImplementation(libs.junit)
+    testImplementation(libs.google.dagger.hilt.android.testing)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(libs.google.dagger.hilt.android.testing)
+
+    // ========== DEBUG ==========
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
-    // Dagger + Hilt
-    implementation(libs.google.dagger.hilt.android)
-    ksp(libs.google.dagger.hilt.android.compiler)
-    implementation(libs.google.dagger.hilt.android.testing)
-    implementation(libs.androidx.hilt.navigation.compose)
-    androidTestImplementation(libs.google.dagger.hilt.android.testing)
-    testImplementation(libs.google.dagger.hilt.android.testing)
 }
