@@ -175,8 +175,9 @@ fun MainScreen() {
             // Por parámetro recibe la ruta que se utilizará para navegar a dicho destino.
 
             composable("home") {
-                // Home es el componente en sí que es el destino de navegación.
-                HomeScreen(modifier = Modifier.padding(paddingValue))
+                HomeScreen(
+                    modifier = Modifier.padding(paddingValue),
+                )
             }
 
             composable(MAP_ROUTE) {
@@ -215,7 +216,10 @@ fun MainScreen() {
                 arguments = listOf(navArgument("petId") { type = NavType.StringType }),
             ) { navBackStackEntry ->
                 val petId = navBackStackEntry.arguments?.getString("petId") ?: ""
-                SearchScreen(petId = petId)
+                SearchScreen(
+                    petId = petId,
+                    modifier = Modifier.padding(paddingValue),
+                )
             }
         }
     }

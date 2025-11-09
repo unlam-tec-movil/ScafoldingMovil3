@@ -4,6 +4,8 @@ import ar.edu.unlam.mobile.scaffolding.data.datasources.local.LocationDataSource
 import ar.edu.unlam.mobile.scaffolding.data.mappers.toDomain
 import ar.edu.unlam.mobile.scaffolding.domain.model.UserLocation
 import ar.edu.unlam.mobile.scaffolding.domain.repository.LocationRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 /**
@@ -51,4 +53,13 @@ class LocationRepositoryImpl
                 // Cualquier otro error
                 Result.failure(e)
             }
+
+        /**
+         * Obtiene actualizaciones continuas de ubicación.
+         * Mapea cada Location que emite el DataSource a UserLocation del dominio.
+         */
+        override fun getLocationUpdates(): Flow<UserLocation> =
+            locationDataSource
+                .getLocationUpdates()
+                .map { location -> location.toDomain() }
     }

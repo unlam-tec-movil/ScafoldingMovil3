@@ -4,6 +4,7 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.DeviceOrientation
 import ar.edu.unlam.mobile.scaffolding.domain.model.Pet
 import ar.edu.unlam.mobile.scaffolding.domain.model.SearchMode
 import ar.edu.unlam.mobile.scaffolding.domain.model.UserLocation
+import kotlin.math.abs
 
 /**
  * Estado de la UI para la pantalla de búsqueda de mascotas.
@@ -21,44 +22,37 @@ data class SearchUiState(
      * null = aún no se obtuvo la ubicación.
      */
     val userLocation: UserLocation? = null,
-
     /**
      * Mascota que se está buscando.
      * Contiene la ubicación (latitude/longitude) donde se perdió o fue vista.
      */
     val pet: Pet? = null,
-
     /**
      * Modo de búsqueda activo.
      * - ROUTE: Muestra polilínea azul por las calles.
      * - RADAR: Muestra flecha roja con orientación directa.
      */
-    val searchMode: SearchMode = SearchMode.ROUTE,
-
+    val searchMode: SearchMode = SearchMode.RADAR,
     /**
      * Orientación del dispositivo (azimut en grados 0-360).
      * Solo se usa en modo RADAR.
      * null = aún no se obtuvo la orientación.
      */
     val deviceOrientation: DeviceOrientation? = null,
-
     /**
      * Bearing (rumbo) hacia la mascota en grados (0-360).
      * null = aún no se calculó.
      * Se calcula usando las ubicaciones del usuario y la mascota.
      */
     val bearingTowardsPet: Float? = null,
-
     /**
      * Indica si se está cargando la ubicación del usuario.
      */
     val isLoadingLocation: Boolean = false,
-
     /**
      * Indica si se tienen permisos de ubicación.
      */
     val hasLocationPermission: Boolean = false,
-
     /**
      * Mensaje de error (si ocurrió alguno).
      * null = no hay error.
@@ -113,5 +107,28 @@ data class SearchUiState(
             }
 
             return rotation
+        }
+
+    /**
+     * Propiedad computada: ¿Está el usuario apuntando correctamente hacia la mascota?
+     *
+     * Indica si el dispositivo está orientado hacia la dirección de la mascota
+     * dentro de un rango de tolerancia (±20 grados).
+     *
+     * Esta lógica de negocio pertenece al UiState, no a la UI.
+     * La UI solo debe leer este valor y renderizar en consecuencia.
+     *
+     * @return true si está dentro del rango de acierto, false en caso contrario.
+     */
+    val isPointingCorrectly: Boolean
+        get() {
+            // Rango de tolerancia para considerar "alineado"
+            val coincidenceRangeDegrees = 20f
+
+            // Necesitamos la rotación calculada
+            val rotation = arrowRotation ?: return false
+
+            // Está apuntando correctamente si la rotación está cerca de 0°
+            return abs(rotation) < coincidenceRangeDegrees
         }
 }

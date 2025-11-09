@@ -1,8 +1,14 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens.search
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import android.provider.Settings
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,12 +16,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Navigation
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
@@ -33,9 +36,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.domain.model.Pet
 import ar.edu.unlam.mobile.scaffolding.domain.model.SearchMode
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -50,8 +55,8 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.rememberMarkerState
 
 const val SEARCH_ROUTE = "search"
 
@@ -70,8 +75,19 @@ const val SEARCH_ROUTE = "search"
 @Composable
 fun SearchScreen(
     petId: String,
+    modifier: Modifier = Modifier,
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
+    val testLocations =
+        listOf(
+            Triple(-34.6706, -58.5664, "UNLaM"),
+            Triple(-34.6534, -58.6196, "Morón"),
+            Triple(-34.6486, -58.5917, "Haedo"),
+            Triple(-34.6646, -58.5974, "Carrefour (Thames y Cno. Cintura)"),
+        )
+
+    val selectedLocation = testLocations[3] // Cambiar el índice para probar diferentes lugares
+
     val context = LocalContext.current
 
     // ===== CREAR MASCOTA TEMPORAL (HARDCODED) =====
@@ -85,15 +101,52 @@ fun SearchScreen(
                 status = "Perdida",
                 gender = "Hembra",
                 seenAt = "2025-01-15",
-                locality = "Palermo, Buenos Aires",
-                latitude = -34.5875,
-                longitude = -58.4197,
+                locality = selectedLocation.third,
+                latitude = selectedLocation.first,
+                longitude = selectedLocation.second,
                 imageUrl = "",
             )
         }
 
     // ===== OBSERVAR ESTADO DEL VIEWMODEL =====
     val uiState by viewModel.uiState.collectAsState()
+
+    // ===== VIBRACIÓN HÁPTICA AL ALINEARSE =====
+    // Recordar el Vibrator una sola vez (optimización + compatibilidad moderna)
+    val vibrator =
+        remember {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                // Android 12+ (API 31+): Usar VibratorManager (forma moderna)
+                val vibratorManager =
+                    context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                vibratorManager.defaultVibrator
+            } else {
+                // Android < 12: Usar API antigua
+                @Suppress("DEPRECATION")
+                context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+            }
+        }
+
+    // Recordar el estado anterior para detectar la transición false → true
+    var wasPointingCorrectlyBefore by remember { mutableStateOf(false) }
+
+    // Vibrar cuando el usuario se alinea correctamente con la mascota
+    LaunchedEffect(uiState.isPointingCorrectly) {
+        // Solo vibrar en el momento exacto de alineación (false → true)
+        if (uiState.isPointingCorrectly && !wasPointingCorrectlyBefore) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                // Android 8.0+ (API 26+)
+                vibrator.vibrate(
+                    VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE),
+                )
+            } else {
+                // Android anterior a 8.0
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(100) // 100ms - corto y sutil
+            }
+        }
+        wasPointingCorrectlyBefore = uiState.isPointingCorrectly
+    }
 
     // ===== INICIALIZAR BÚSQUEDA =====
     LaunchedEffect(pet) {
@@ -134,13 +187,16 @@ fun SearchScreen(
         }
 
     // ===== ANIMAR CÁMARA CUANDO LLEGA LA UBICACIÓN DEL USUARIO =====
-    LaunchedEffect(uiState.userLocation) {
-        uiState.userLocation?.let { location ->
-            val latLng = LatLng(location.latitude, location.longitude)
-            cameraPositionState.animate(
-                update = CameraUpdateFactory.newLatLngZoom(latLng, 16f),
-                durationMs = 800,
-            )
+    // En modo RADAR: mantener la cámara centrada en el usuario (HUD)
+    LaunchedEffect(uiState.userLocation, uiState.searchMode) {
+        if (uiState.searchMode == SearchMode.RADAR) {
+            uiState.userLocation?.let { location ->
+                val latLng = LatLng(location.latitude, location.longitude)
+                cameraPositionState.animate(
+                    update = CameraUpdateFactory.newLatLng(latLng),
+                    durationMs = 1000,
+                )
+            }
         }
     }
 
@@ -205,25 +261,33 @@ fun SearchScreen(
     }
 
     // ===== UI: MAPA CON RADAR =====
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()) {
         // ===== GOOGLE MAP =====
         GoogleMap(
             modifier = Modifier.fillMaxSize(),
             cameraPositionState = cameraPositionState,
             properties =
                 MapProperties(
-                    isMyLocationEnabled = true, // Punto azul del usuario + haz de luz
+                    isMyLocationEnabled = false, // Apagado para evitar Z-fighting con nuestro marker
                 ),
             uiSettings =
                 MapUiSettings(
-                    myLocationButtonEnabled = true, // Botón para centrar
-                    zoomControlsEnabled = false,
+                    myLocationButtonEnabled = false, // No necesario en modo radar
+                    zoomControlsEnabled = true, // Permitir zoom
                     compassEnabled = true,
+                    // En modo RADAR: bloquear arrastre (scroll) para mantener usuario centrado
+                    scrollGesturesEnabled = (uiState.searchMode != SearchMode.RADAR),
+                    zoomGesturesEnabled = true,
                 ),
         ) {
             // ===== MARKER DE LA MASCOTA =====
+            val markerState =
+                rememberMarkerState(
+                    position = LatLng(pet.latitude, pet.longitude),
+                )
+
             Marker(
-                state = MarkerState(LatLng(pet.latitude, pet.longitude)),
+                state = markerState,
                 title = pet.name,
                 snippet = "Mascota perdida",
                 icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
@@ -273,14 +337,16 @@ fun SearchScreen(
             }
         }
 
-        // ===== FLECHA ROJA (MODO RADAR) =====
+        // ===== FLECHA ROJA/VERDE FLOTANTE (MODO RADAR HUD) =====
+        // La flecha está FIJA en el centro de la pantalla
+        // Como la cámara sigue al usuario, el centro de la pantalla = ubicación del usuario
+        // La flecha rota según: bearing - azimuth (apunta hacia la mascota relativo a tu orientación)
+        // Cambia de color cuando el usuario apunta correctamente (lógica en UiState)
         if (uiState.searchMode == SearchMode.RADAR && uiState.isReady) {
             RadarArrow(
                 rotation = uiState.arrowRotation ?: 0f,
-                modifier =
-                    Modifier
-                        .align(Alignment.Center)
-                        .size(100.dp),
+                isPointingCorrectly = uiState.isPointingCorrectly,
+                modifier = Modifier.align(Alignment.Center),
             )
         }
 
@@ -314,23 +380,39 @@ fun SearchScreen(
 }
 
 /**
- * Componente que dibuja una flecha roja rotada.
+ * Componente de flecha para modo RADAR (HUD).
+ * Componente "tonto" que solo renderiza según el estado recibido.
+ * NO contiene lógica de negocio.
  *
- * La flecha apunta hacia la mascota considerando la orientación del dispositivo.
+ * Aparece fija en el centro de la pantalla.
+ * Rota para apuntar hacia la mascota relativo a la orientación del dispositivo.
+ * Cambia de color según la alineación (calculada por el UiState):
+ * - VERDE: Usuario apuntando correctamente hacia la mascota
+ * - ROJA: Usuario debe seguir buscando la dirección
  *
- * @param rotation Ángulo de rotación en grados.
- * @param modifier Modificador de Compose.
+ * @param rotation Ángulo de rotación en grados (calculado por UiState)
+ * @param isPointingCorrectly True si el usuario está alineado (calculado por UiState)
+ * @param modifier Modificador de Compose
  */
 @Composable
 fun RadarArrow(
     rotation: Float,
+    isPointingCorrectly: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    // Elegir la flecha según el estado recibido (sin calcular nada)
+    val arrowResource =
+        if (isPointingCorrectly) {
+            R.drawable.flecha_verde // ¡Perfecto! Camina hacia adelante
+        } else {
+            R.drawable.flecha_roja // Sigue girando para encontrar la dirección
+        }
+
     Box(
-        modifier = modifier,
+        modifier = modifier.size(100.dp),
         contentAlignment = Alignment.Center,
     ) {
-        // Fondo semi-transparente
+        // Fondo circular semi-transparente
         Box(
             modifier =
                 Modifier
@@ -341,15 +423,19 @@ fun RadarArrow(
                     ),
         )
 
-        // Flecha rotada
-        Icon(
-            imageVector = Icons.Default.Navigation,
-            contentDescription = "Dirección hacia la mascota",
-            tint = Color.Red,
+        // Flecha PNG rotada (roja o verde según alineación)
+        Image(
+            painter = painterResource(arrowResource),
+            contentDescription =
+                if (isPointingCorrectly) {
+                    "¡Alineado! Camina hacia adelante"
+                } else {
+                    "Gira para encontrar la dirección"
+                },
             modifier =
                 Modifier
                     .size(60.dp)
-                    .rotate(rotation), // Rotar según el cálculo del ViewModel
+                    .rotate(rotation), // Rotación relativa al dispositivo
         )
     }
 }

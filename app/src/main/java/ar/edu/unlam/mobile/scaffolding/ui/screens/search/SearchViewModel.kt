@@ -11,10 +11,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -29,182 +29,199 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class SearchViewModel
-@Inject
-constructor(
-    private val locationRepository: LocationRepository,
-    private val sensorRepository: SensorRepository,
-    private val calculateBearingUseCase: CalculateBearingUseCase,
-) : ViewModel() {
-    // ===== ESTADO DE LA UI =====
+    @Inject
+    constructor(
+        private val locationRepository: LocationRepository,
+        private val sensorRepository: SensorRepository,
+        private val calculateBearingUseCase: CalculateBearingUseCase,
+    ) : ViewModel() {
+        // ===== ESTADO DE LA UI =====
 
-    private val _uiState = MutableStateFlow(SearchUiState())
-    val uiState: StateFlow<SearchUiState> = _uiState
+        private val _uiState = MutableStateFlow(SearchUiState())
+        val uiState: StateFlow<SearchUiState> = _uiState
 
-    // ===== JOBS DE COROUTINES =====
+        // ===== JOBS DE COROUTINES =====
 
-    /**
-     * Job que escucha la orientación del dispositivo.
-     * Se cancela cuando se sale del modo Radar.
-     */
-    private var sensorJob: Job? = null
+        /**
+         * Job que escucha la orientación del dispositivo.
+         * Se cancela cuando se sale del modo Radar.
+         */
+        private var sensorJob: Job? = null
 
-    // ===== FUNCIONES PÚBLICAS (LLAMADAS DESDE LA UI) =====
+        /**
+         * Job que escucha actualizaciones continuas de ubicación.
+         * Se cancela cuando se destruye el ViewModel.
+         */
+        private var locationJob: Job? = null
 
-    /**
-     * Inicializa la búsqueda con una mascota específica.
-     *
-     * @param pet La mascota que se está buscando.
-     */
-    fun initSearch(pet: Pet) {
-        _uiState.update { it.copy(pet = pet) }
+        // ===== FUNCIONES PÚBLICAS (LLAMADAS DESDE LA UI) =====
 
-        // Cargar la ubicación del usuario
-        loadUserLocation()
+        /**
+         * Inicializa la búsqueda con una mascota específica.
+         *
+         * @param pet La mascota que se está buscando.
+         */
+        fun initSearch(pet: Pet) {
+            _uiState.update { it.copy(pet = pet) }
 
-        // Calcular el bearing hacia la mascota
-        calculateBearing()
-    }
+            // Iniciar listener de ubicación continua
+            startListeningToLocation()
 
-    /**
-     * Actualiza el estado del permiso de ubicación.
-     *
-     * @param granted true si el permiso fue concedido, false si no.
-     */
-    fun onLocationPermissionChanged(granted: Boolean) {
-        _uiState.update { it.copy(hasLocationPermission = granted) }
-
-        // Si se concedió el permiso, cargar la ubicación
-        if (granted) {
-            loadUserLocation()
-        }
-    }
-
-    /**
-     * Cambia entre los modos de búsqueda (Ruta/Radar).
-     *
-     * @param mode El nuevo modo de búsqueda.
-     */
-    fun onSearchModeChanged(mode: SearchMode) {
-        _uiState.update { it.copy(searchMode = mode) }
-
-        when (mode) {
-            SearchMode.RADAR -> {
-                // Activar el listener de sensores
+            // Si el estado inicial es RADAR, arrancar los sensores
+            // sin esperar a que el usuario presione el botón
+            if (_uiState.value.searchMode == SearchMode.RADAR) {
                 startListeningToSensors()
             }
-            SearchMode.ROUTE -> {
-                // Desactivar el listener de sensores
-                stopListeningToSensors()
+        }
+
+        /**
+         * Actualiza el estado del permiso de ubicación.
+         *
+         * @param granted true si el permiso fue concedido, false si no.
+         */
+        fun onLocationPermissionChanged(granted: Boolean) {
+            _uiState.update { it.copy(hasLocationPermission = granted) }
+
+            // Si se concedió el permiso, iniciar listener de ubicación
+            if (granted) {
+                startListeningToLocation()
+            } else {
+                // Si se revocó, detener el listener
+                stopListeningToLocation()
             }
         }
-    }
 
-    /**
-     * Recarga la ubicación del usuario manualmente.
-     * Útil si el usuario presiona un botón de "actualizar ubicación".
-     */
-    fun refreshLocation() {
-        loadUserLocation()
-    }
+        /**
+         * Cambia entre los modos de búsqueda (Ruta/Radar).
+         *
+         * @param mode El nuevo modo de búsqueda.
+         */
+        fun onSearchModeChanged(mode: SearchMode) {
+            _uiState.update { it.copy(searchMode = mode) }
 
-    // ===== FUNCIONES PRIVADAS (LÓGICA INTERNA) =====
+            when (mode) {
+                SearchMode.RADAR -> {
+                    // Activar el listener de sensores
+                    startListeningToSensors()
+                }
+                SearchMode.ROUTE -> {
+                    // Desactivar el listener de sensores
+                    stopListeningToSensors()
+                }
+            }
+        }
 
-    /**
-     * Carga la ubicación actual del usuario.
-     */
-    private fun loadUserLocation() {
-        viewModelScope.launch {
-            // Indicar que está cargando
+        // ===== FUNCIONES PRIVADAS (LÓGICA INTERNA) =====
+
+        /**
+         * Inicia el listener de ubicación continua.
+         * Escucha continuamente cambios en la ubicación del usuario y actualiza el estado.
+         */
+        private fun startListeningToLocation() {
+            // Cancelar el job anterior si existía
+            locationJob?.cancel()
+
+            // Indicar que está cargando (solo la primera vez)
             _uiState.update { it.copy(isLoadingLocation = true, errorMessage = null) }
 
-            // Obtener la ubicación del repositorio
-            val result = locationRepository.getCurrentLocation()
+            // Crear un nuevo job que escucha el Flow de ubicación
+            locationJob =
+                locationRepository
+                    .getLocationUpdates()
+                    .onEach { userLocation ->
+                        // Por cada nueva ubicación, actualizar el estado
+                        _uiState.update {
+                            it.copy(
+                                userLocation = userLocation,
+                                isLoadingLocation = false,
+                            )
+                        }
 
-            result
-                .onSuccess { userLocation ->
-                    // Actualizar el estado con la ubicación
-                    _uiState.update {
-                        it.copy(
-                            userLocation = userLocation,
-                            isLoadingLocation = false,
-                        )
-                    }
+                        // Recalcular el bearing con la nueva ubicación
+                        calculateBearing()
+                    }.catch { exception ->
+                        // Si el Flow falla (ej. permisos revocados, GPS apagado),
+                        // manejar el error aquí
+                        _uiState.update {
+                            it.copy(
+                                isLoadingLocation = false,
+                                errorMessage = exception.message ?: "Error al obtener ubicación continua",
+                            )
+                        }
+                    }.launchIn(viewModelScope)
+        }
 
-                    // Recalcular el bearing con la nueva ubicación
-                    calculateBearing()
-                }.onFailure { exception ->
-                    // Actualizar el estado con el error
-                    _uiState.update {
-                        it.copy(
-                            isLoadingLocation = false,
-                            errorMessage = exception.message ?: "Error al obtener ubicación",
-                        )
-                    }
-                }
+        /**
+         * Detiene el listener de ubicación.
+         * Se llama al salir de la pantalla o si se revoca el permiso.
+         */
+        private fun stopListeningToLocation() {
+            locationJob?.cancel()
+            locationJob = null
+        }
+
+        /**
+         * Calcula el bearing (rumbo) hacia la mascota.
+         *
+         * Solo se calcula si tenemos ambas ubicaciones (usuario y mascota).
+         */
+        private fun calculateBearing() {
+            val currentState = _uiState.value
+            val userLoc = currentState.userLocation ?: return
+            val pet = currentState.pet ?: return
+
+            // Llamar al Use Case para calcular el bearing
+            val bearing =
+                calculateBearingUseCase(
+                    fromLatitude = userLoc.latitude,
+                    fromLongitude = userLoc.longitude,
+                    toLatitude = pet.latitude,
+                    toLongitude = pet.longitude,
+                )
+
+            // Actualizar el estado con el bearing calculado
+            _uiState.update { it.copy(bearingTowardsPet = bearing) }
+        }
+
+        /**
+         * Inicia el listener de sensores para el modo Radar.
+         *
+         * Escucha continuamente la orientación del dispositivo y actualiza el estado.
+         */
+        private fun startListeningToSensors() {
+            // Cancelar el job anterior si existía
+            sensorJob?.cancel()
+
+            // Crear un nuevo job que escucha el Flow de orientación
+            sensorJob =
+                sensorRepository
+                    .getDeviceOrientation()
+                    .onEach { orientation ->
+                        // Por cada nuevo valor de orientación, actualizar el estado
+                        _uiState.update { it.copy(deviceOrientation = orientation) }
+                    }.launchIn(viewModelScope)
+        }
+
+        /**
+         * Detiene el listener de sensores.
+         *
+         * Se llama al cambiar al modo Ruta o al salir de la pantalla.
+         */
+        private fun stopListeningToSensors() {
+            sensorJob?.cancel()
+            sensorJob = null
+
+            // Limpiar la orientación del estado
+            _uiState.update { it.copy(deviceOrientation = null) }
+        }
+
+        /**
+         * Se llama automáticamente cuando el ViewModel se destruye.
+         * Limpia los recursos (cancela los listeners).
+         */
+        override fun onCleared() {
+            super.onCleared()
+            stopListeningToSensors()
+            stopListeningToLocation()
         }
     }
-
-    /**
-     * Calcula el bearing (rumbo) hacia la mascota.
-     *
-     * Solo se calcula si tenemos ambas ubicaciones (usuario y mascota).
-     */
-    private fun calculateBearing() {
-        val currentState = _uiState.value
-        val userLoc = currentState.userLocation ?: return
-        val pet = currentState.pet ?: return
-
-        // Llamar al Use Case para calcular el bearing
-        val bearing =
-            calculateBearingUseCase(
-                fromLatitude = userLoc.latitude,
-                fromLongitude = userLoc.longitude,
-                toLatitude = pet.latitude,
-                toLongitude = pet.longitude,
-            )
-
-        // Actualizar el estado con el bearing calculado
-        _uiState.update { it.copy(bearingTowardsPet = bearing) }
-    }
-
-    /**
-     * Inicia el listener de sensores para el modo Radar.
-     *
-     * Escucha continuamente la orientación del dispositivo y actualiza el estado.
-     */
-    private fun startListeningToSensors() {
-        // Cancelar el job anterior si existía
-        sensorJob?.cancel()
-
-        // Crear un nuevo job que escucha el Flow de orientación
-        sensorJob =
-            sensorRepository
-                .getDeviceOrientation()
-                .onEach { orientation ->
-                    // Por cada nuevo valor de orientación, actualizar el estado
-                    _uiState.update { it.copy(deviceOrientation = orientation) }
-                }.launchIn(viewModelScope)
-    }
-
-    /**
-     * Detiene el listener de sensores.
-     *
-     * Se llama al cambiar al modo Ruta o al salir de la pantalla.
-     */
-    private fun stopListeningToSensors() {
-        sensorJob?.cancel()
-        sensorJob = null
-
-        // Limpiar la orientación del estado
-        _uiState.update { it.copy(deviceOrientation = null) }
-    }
-
-    /**
-     * Se llama automáticamente cuando el ViewModel se destruye.
-     * Limpia los recursos (cancela el listener de sensores).
-     */
-    override fun onCleared() {
-        super.onCleared()
-        stopListeningToSensors()
-    }
-}

@@ -11,6 +11,6 @@ package ar.edu.unlam.mobile.scaffolding.domain.model
  * - 180° = Sur
  * - 270° = Oeste
  */
-data class DeviceOrientation (
+data class DeviceOrientation(
     val azimuth: Float,
 )

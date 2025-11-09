@@ -1,4 +1,5 @@
 package ar.edu.unlam.mobile.scaffolding.domain.model
+
 data class Pet(
     val id: String = "",
     val name: String = "",
@@ -9,5 +10,5 @@ data class Pet(
     val locality: String = "",
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
-    val imageUrl: String = ""
+    val imageUrl: String = "",
 )
