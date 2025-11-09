@@ -1,10 +1,12 @@
 package ar.edu.unlam.mobile.scaffolding
 
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultCallback
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,8 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -26,7 +26,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,10 +38,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import ar.edu.unlam.mobile.scaffolding.ui.components.AppTopBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.components.SnackbarVisualsWithError
 import ar.edu.unlam.mobile.scaffolding.ui.screens.home.HOME_SCREEN_ROUTE
 import ar.edu.unlam.mobile.scaffolding.ui.screens.home.HomeScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MAP_ROUTE
 import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.editProfile.EditProfile
@@ -100,13 +101,15 @@ fun MainScreen() {
     val snackBarHostState = remember { SnackbarHostState() }
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Petapp pa") },
-                navigationIcon = {
-                    Button(onClick = {}, modifier = Modifier) {
+            AppTopBar(
+                title = "Petapp",
+                onMenuClick = { /* abrir drawer o filtros */ },
+                actions = {
+                    IconButton(onClick = { /* acción secundaria */ }) {
                         Icon(
-                            imageVector = Icons.Default.Menu,
-                            contentDescription = "Filters",
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Agregar",
+                            tint = MaterialTheme.colorScheme.onPrimary,
                         )
                     }
                 },
@@ -174,7 +177,7 @@ fun MainScreen() {
                 HomeScreen(modifier = Modifier.padding(paddingValue))
             }
 
-            composable("map") {
+            composable(MAP_ROUTE) {
                 MapScreen()
             }
 
@@ -183,7 +186,10 @@ fun MainScreen() {
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
             ) { navBackStackEntry ->
                 val id = navBackStackEntry.arguments?.getString("id") ?: "1"
-                UserScreen(controller)
+                UserScreen(
+                    controller = controller,
+                    modifier = Modifier.padding(paddingValue),
+                )
             }
             composable("edit") {
                 EditProfile(controller)
