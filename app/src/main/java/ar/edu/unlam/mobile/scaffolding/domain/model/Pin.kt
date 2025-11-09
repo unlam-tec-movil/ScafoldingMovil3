@@ -7,7 +7,7 @@ data class Pin(
     val id: String,
     val latitude: Double,
     val longitude: Double,
-    val imageUrl: String
+    val imageUrl: String,
 )
 
 interface PetRepository {

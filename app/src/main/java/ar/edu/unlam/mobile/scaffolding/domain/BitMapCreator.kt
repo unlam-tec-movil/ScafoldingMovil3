@@ -6,16 +6,17 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.drawable.BitmapDrawable
+import androidx.core.graphics.createBitmap
+import androidx.core.graphics.scale
 import coil.ImageLoader
 import coil.request.ImageRequest
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import androidx.core.graphics.scale
-import androidx.core.graphics.createBitmap
+
 
 suspend fun loadMarkerDescriptorFromUrl(
     context: Context,
-    url: String
+    url: String,
 ): BitmapDescriptor? {
     val loader = ImageLoader(context)
     val req = ImageRequest.Builder(context)
@@ -26,8 +27,8 @@ suspend fun loadMarkerDescriptorFromUrl(
     val result = loader.execute(req).drawable ?: return null
     val bitmap = (result as BitmapDrawable).bitmap
     val circular = createCircularMarkerBitmap(bitmap)
-    return BitmapDescriptorFactory.fromBitmap(circular)
-}
+    return BitmapDescriptorFactory.fromBitmap(circular) }
+
 fun createCircularMarkerBitmap(avatarBitmap: Bitmap): Bitmap {
     val size = 160            // tamaño total del marcador
     val border = 10f          // grosor del borde
@@ -59,7 +60,7 @@ fun createCircularMarkerBitmap(avatarBitmap: Bitmap): Bitmap {
             innerSize / 2f,
             innerSize / 2f,
             innerSize / 2f,
-            Path.Direction.CCW
+            Path.Direction.CCW,
         )
     }
     avatarCanvas.clipPath(path)
@@ -68,8 +69,7 @@ fun createCircularMarkerBitmap(avatarBitmap: Bitmap): Bitmap {
 
     // 3) dibujar la foto redondeada sobre el marcador con borde
     val left = border
-    val top = border
-    canvas.drawBitmap(clippedAvatar, left, top, null)
+    canvas.drawBitmap(clippedAvatar, left, border, null)
 
     return out
 }

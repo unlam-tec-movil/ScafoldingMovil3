@@ -22,13 +22,14 @@ import ar.edu.unlam.mobile.scaffolding.domain.loadMarkerDescriptorFromUrl
 import ar.edu.unlam.mobile.scaffolding.ui.components.AddPinDialog
 import ar.edu.unlam.mobile.scaffolding.ui.components.ShowPermissionDenied
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -43,6 +44,7 @@ const val MAP_ROUTE = "map"
  * Observa estados del MapViewModel (StateFlow).
  * Arquitectura limpia: usa Pin del dominio y PinRepository.
  */
+
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable

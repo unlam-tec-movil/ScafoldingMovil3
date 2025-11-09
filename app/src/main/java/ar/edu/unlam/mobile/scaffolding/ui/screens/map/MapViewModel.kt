@@ -20,7 +20,6 @@ class MapViewModel
         private val pinRepository: PinRepository,
     ) : ViewModel() {
 
-
     private val _pets = MutableStateFlow<List<Pin>>(emptyList())
     val pets: StateFlow<List<Pin>> = _pets
 

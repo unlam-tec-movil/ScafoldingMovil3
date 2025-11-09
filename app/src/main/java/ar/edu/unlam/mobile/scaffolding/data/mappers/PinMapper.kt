@@ -16,7 +16,7 @@ fun PlacePin.toDomain(): Pin =
         id = this.id,
         latitude = this.lat,
         longitude = this.lng,
-        imageUrl = this.imageURL
+        imageUrl = this.imageURL,
     )
 
 /**
@@ -32,5 +32,5 @@ fun Pin.toData(): PlacePin =
         id = this.id,
         lat = this.latitude,
         lng = this.longitude,
-        imageURL= this.imageUrl
+        imageURL = this.imageUrl,
     )

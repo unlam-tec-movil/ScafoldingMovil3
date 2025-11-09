@@ -10,5 +10,5 @@ data class PlacePin(
             .toString(),
     val lat: Double,
     val lng: Double,
-    val imageURL : String
+    val imageURL: String,
 )

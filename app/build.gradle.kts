@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.google.dagger.hilt.android)
     implementation(libs.androidx.compose.foundation)
     implementation(libs.androidx.compose.foundation.layout)
+    implementation(libs.androidbrowserhelper)
     ksp(libs.google.dagger.hilt.android.compiler)
     implementation(libs.androidx.hilt.navigation.compose)
 
