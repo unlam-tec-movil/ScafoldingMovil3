@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.mobile.scaffolding.data.models.Gender
 import ar.edu.unlam.mobile.scaffolding.data.models.Pet
+import ar.edu.unlam.mobile.scaffolding.data.models.Status
 import ar.edu.unlam.mobile.scaffolding.data.models.Type
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorTwo
 
@@ -77,7 +78,7 @@ fun PostFoundPet(
                     onFinishClick = {
                         Log.d("PostScreen", "Botón Finalizar clickeado")
 
-                        if (name.isNotBlank() &&
+                        if (
                             seenAt.isNotBlank() &&
                             locality.isNotBlank() &&
                             selectedGender != null &&
@@ -85,11 +86,12 @@ fun PostFoundPet(
                         ) {
                             val pet =
                                 Pet(
-                                    name = name,
+                                    name = "",
                                     seenAt = seenAt,
                                     locality = locality,
                                     gender = selectedGender!!,
                                     type = selectedType!!,
+                                    status = Status.FOUND
                                 )
                             Log.d("PostScreen", "Datos de mascota listos: $pet")
 

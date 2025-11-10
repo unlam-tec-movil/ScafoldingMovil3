@@ -152,7 +152,7 @@ fun InputSection(
         ShadowedTextField(
             value = email,
             onValueChange = onEmailChange,
-            placeholder = "Nombre",
+            placeholder = "E-mail",
             leadingIcon = Icons.Default.Person,
         )
         ShadowedTextField(

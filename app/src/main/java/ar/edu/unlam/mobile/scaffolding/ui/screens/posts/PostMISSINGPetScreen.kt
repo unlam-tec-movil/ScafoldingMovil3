@@ -1,8 +1,15 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens.posts
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
@@ -24,12 +31,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.mobile.scaffolding.data.models.Gender
 import ar.edu.unlam.mobile.scaffolding.data.models.Pet
 import ar.edu.unlam.mobile.scaffolding.data.models.Type
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorTwo
 import coil.compose.rememberAsyncImagePainter
+import java.io.File
+import android.Manifest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,7 +76,6 @@ fun PostMissingPetScreen(
                 PostMissingPetTopBar(
                     onBackClick = onBackClick,
                     onFinishClick = {
-                        Log.d("PostScreen", "Botón Finalizar clickeado")
 
                         if (name.isNotBlank() &&
                             seenAt.isNotBlank() &&
@@ -89,7 +99,6 @@ fun PostMissingPetScreen(
                             }
                         } else {
                             Toast.makeText(context, "Faltan completar campos", Toast.LENGTH_SHORT).show()
-                            Log.e("PostScreen", "Campos faltantes")
                         }
                     },
                 )
@@ -191,46 +200,141 @@ fun PetPhotoUploader(
     selectedImageUri: Uri?,
     onImageSelected: (Uri?) -> Unit,
 ) {
-    val launcher =
+    val context = LocalContext.current
+
+    val galleryLauncher =
         rememberLauncherForActivityResult(
-            contract = ActivityResultContracts.GetContent(),
+            contract = ActivityResultContracts.GetContent()
         ) { uri: Uri? ->
             onImageSelected(uri)
         }
 
+    // uri temporal para la foto de cámara
+    var cameraUri by remember { mutableStateOf<Uri?>(null) }
+
+    val cameraLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.TakePicture()
+        ) { success ->
+            if (success) onImageSelected(cameraUri)
+        }
+
+    var showPicker by remember { mutableStateOf(false) }
+
+    if (showPicker) {
+        AlertDialog(
+            containerColor= Color.White,
+            onDismissRequest = { showPicker = false },
+            confirmButton = {},
+            title = { Text("Seleccionar foto") },
+            text = {
+                Column {
+                    Text(
+                        text = "Tomar una foto",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showPicker = false
+
+                                // verifica permiso para la cámara
+                                if (ContextCompat.checkSelfPermission(
+                                        context,
+                                        Manifest.permission.CAMERA
+                                    ) == PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    // Abre la cámara si el permiso ya está concedido
+                                    cameraUri = FileProvider.getUriForFile(
+                                        context,
+                                        "${context.packageName}.provider",
+                                        createImageFile(context)
+                                    )
+                                    cameraLauncher.launch(cameraUri!!)
+                                } else {
+                                    // pedir permiso para usar la cámara!!
+                                    val permissionLauncher = (context as ComponentActivity)
+                                        .activityResultRegistry
+                                        .register(
+                                            "cameraPermission",
+                                            ActivityResultContracts.RequestPermission()
+                                        ) { granted ->
+                                            if (granted) {
+                                                cameraUri = FileProvider.getUriForFile(
+                                                    context,
+                                                    "${context.packageName}.provider",
+                                                    createImageFile(context)
+                                                )
+                                                cameraLauncher.launch(cameraUri!!)
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Se necesita permiso de cámara",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
+                                    permissionLauncher.launch(Manifest.permission.CAMERA)
+                                }
+                            }
+                            .padding(12.dp)
+                    )
+
+                    Text(
+                        text = "Elegir de galería",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                showPicker = false
+                                galleryLauncher.launch("image/*")
+                            }
+                            .padding(12.dp)
+                    )
+                }
+            }
+        )
+    }
+
+    // box con la opción a seleccionar
     Box(
-        modifier =
-            Modifier
-                .fillMaxWidth()
-                .height(180.dp)
-                .border(1.dp, Color.Gray, RoundedCornerShape(30.dp))
-                .clickable { launcher.launch("image/*") }
-                .background(Color.White, shape = RoundedCornerShape(30.dp)),
-        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(180.dp)
+            .border(1.dp, Color.Gray, RoundedCornerShape(30.dp))
+            .clickable { showPicker = true }
+            .background(Color.White, RoundedCornerShape(30.dp)),
+        contentAlignment = Alignment.Center
     ) {
         if (selectedImageUri != null) {
             Image(
                 painter = rememberAsyncImagePainter(selectedImageUri),
                 contentDescription = "Foto de mascota",
-                modifier =
-                    Modifier
-                        .fillMaxSize()
-                        .clip(RoundedCornerShape(30.dp)),
-                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(30.dp)),
+                contentScale = ContentScale.Crop
             )
         } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
                     imageVector = Icons.Default.AddPhotoAlternate,
-                    contentDescription = "Agregar fotos",
+                    contentDescription = "Agregar foto",
                     tint = Color.Gray,
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(48.dp)
                 )
                 Text("Añade una foto", color = Color.Gray)
             }
         }
     }
 }
+
+fun createImageFile(context: Context): File {
+    val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+    return File.createTempFile(
+        "pet_photo_",
+        ".jpg",
+        storageDir
+    )
+}
+
 
 @Composable
 fun PetTextField(

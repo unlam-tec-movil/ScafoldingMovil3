@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -43,6 +44,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -62,31 +64,31 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.mobile.scaffolding.data.models.Gender
 import ar.edu.unlam.mobile.scaffolding.data.models.Pet
+import ar.edu.unlam.mobile.scaffolding.data.models.Status
 import ar.edu.unlam.mobile.scaffolding.data.models.Type
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostCard
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
+import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorOne
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorTwo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.PetFinderFont
 import ar.edu.unlam.mobile.scaffolding.ui.theme.SoftGray
 import kotlin.String
 import kotlin.Unit
 
-const val FEED_SCREEN_ROUTE = "feed"
+//const val FEED_SCREEN_ROUTE = "feed"
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
 @Composable
 fun FeedScreen(viewModel: PostViewModel = hiltViewModel()) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var showSheet by remember { mutableStateOf(false) }
-
-    val pets by viewModel.pets.collectAsState()
+    val status by viewModel.statusFilter.collectAsState()
+    val pets by viewModel.filteredPets.collectAsState()
 
     Box(
         modifier =
@@ -119,7 +121,11 @@ fun FeedScreen(viewModel: PostViewModel = hiltViewModel()) {
                     Modifier
                         .padding(horizontal = 16.dp),
             ) {
-                PerdidosEncontradosButtons()
+
+                PerdidosEncontradosButtons(
+                    selected = status,
+                    onSelected = { viewModel.setStatusFilter(it) }
+                )
                 Spacer(modifier = Modifier.weight(1f))
                 FilterButton(onClick = { showSheet = true })
             }
@@ -177,17 +183,23 @@ fun FilterButton(onClick: () -> Unit) {
 }
 
 @Composable
-fun FilterContent(onClose: () -> Unit) {
-    var selectedType by remember { mutableStateOf<Type?>(null) }
-    var selectedGender by remember { mutableStateOf<Gender?>(null) }
-    var locality by remember { mutableStateOf("") }
+fun FilterContent(
+    onClose: () -> Unit,
+    viewModel: PostViewModel = hiltViewModel()
+) {
+    val currentType by viewModel.typeFilter.collectAsState()
+    val currentGender by viewModel.genderFilter.collectAsState()
+    val currentLocality by viewModel.localityFilter.collectAsState()
+
+    var selectedType by remember { mutableStateOf(currentType) }
+    var selectedGender by remember { mutableStateOf(currentGender) }
+    var locality by remember { mutableStateOf(currentLocality ?: "") }
 
     Column(
-        modifier =
-            Modifier
-                .fillMaxSize()
-                .background(Color.White)
-                .padding(16.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(16.dp),
     ) {
         Text(
             "Filtrar por:",
@@ -213,7 +225,6 @@ fun FilterContent(onClose: () -> Unit) {
         Spacer(Modifier.height(16.dp))
         Text("Género:", fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(16.dp))
-
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -223,19 +234,16 @@ fun FilterContent(onClose: () -> Unit) {
                 onGenderSelected = { selectedGender = it },
             )
         }
+
         Spacer(Modifier.height(16.dp))
         Text("Localidad:", fontWeight = FontWeight.SemiBold)
         Spacer(Modifier.height(16.dp))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Locality(
-                value = locality,
-                onValueChange = { locality = it },
-            )
-        }
+        Locality(
+            value = locality,
+            onValueChange = { locality = it },
+        )
+
         Spacer(Modifier.height(16.dp))
 
         Row(
@@ -243,28 +251,34 @@ fun FilterContent(onClose: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             Button(
-                onClick = onClose,
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .height(50.dp),
+                onClick = {
+                    viewModel.setTypeFilter(selectedType)
+                    viewModel.setGenderFilter(selectedGender)
+                    viewModel.setLocalityFilter(locality.ifBlank { null })
+                },
+                modifier = Modifier.weight(1f).height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = ColorTwo),
             ) {
                 Text("Aplicar", color = Color.White)
             }
-            Button(
-                onClick = onClose,
-                modifier =
-                    Modifier
-                        .weight(1f)
-                        .height(50.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFAB7C7)),
+
+            OutlinedButton(
+                onClick = {
+                    selectedType = null
+                    selectedGender = null
+                    locality = ""
+                    viewModel.clearFilters()
+                },
+                modifier = Modifier.weight(1f).height(50.dp),
+                border = BorderStroke(2.dp, ColorOne),
             ) {
                 Text("Limpiar", color = Color(0xFFD92656))
             }
         }
     }
 }
+
+
 
 @Composable
 fun Locality(
@@ -370,53 +384,55 @@ fun GenderButtons(
         }
     }
 }
-
 @Composable
-fun PerdidosEncontradosButtons() {
-    var selectedButton by remember { mutableStateOf("Perdidos") }
+fun PerdidosEncontradosButtons(
+    selected: Status,
+    onSelected: (Status) -> Unit
+) {
+    val isPerdidos = selected == Status.LOST
+    val isEncontrados = selected == Status.FOUND
 
     val colorPerdidosBackground by animateColorAsState(
-        targetValue = if (selectedButton == "Perdidos") ColorTwo else Color.White,
-        animationSpec = tween(durationMillis = 400),
+        if (isPerdidos) ColorTwo else Color.White,
+        tween(400)
     )
     val colorPerdidosText by animateColorAsState(
-        targetValue = if (selectedButton == "Perdidos") Color.White else ColorTwo,
-        animationSpec = tween(durationMillis = 400),
+        if (isPerdidos) Color.White else ColorTwo,
+        tween(400)
     )
 
     val colorEncontradosBackground by animateColorAsState(
-        targetValue = if (selectedButton == "Encontrados") ColorTwo else Color.White,
-        animationSpec = tween(durationMillis = 400),
+        if (isEncontrados) ColorTwo else Color.White,
+        tween(400)
     )
     val colorEncontradosText by animateColorAsState(
-        targetValue = if (selectedButton == "Encontrados") Color.White else ColorTwo,
-        animationSpec = tween(durationMillis = 400),
+        if (isEncontrados) Color.White else ColorTwo,
+        tween(400)
     )
 
     Button(
-        onClick = { selectedButton = "Perdidos" },
+        onClick = { onSelected(Status.LOST) },
         shape = RoundedCornerShape(50.dp),
-        colors =
-            ButtonDefaults.buttonColors(
-                containerColor = colorPerdidosBackground,
-                contentColor = colorPerdidosText,
-            ),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = colorPerdidosBackground,
+            contentColor = colorPerdidosText
+        )
     ) {
         Text("Perdidos")
     }
 
     Button(
-        onClick = { selectedButton = "Encontrados" },
+        onClick = { onSelected(Status.FOUND) },
         shape = RoundedCornerShape(50.dp),
-        colors =
-            ButtonDefaults.buttonColors(
-                containerColor = colorEncontradosBackground,
-                contentColor = colorEncontradosText,
-            ),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = colorEncontradosBackground,
+            contentColor = colorEncontradosText
+        )
     ) {
         Text("Encontrados")
     }
 }
+
 
 @Composable
 fun AppName(modifier: Modifier = Modifier) {

@@ -359,7 +359,7 @@ fun CampoDeTexto(
                 .padding(horizontal = 20.dp)
                 .fillMaxWidth()
                 .onFocusChanged { focusState -> onFocusChange(focusState.isFocused) },
-        placeholder = { Text("Usuario") },
+        placeholder = { Text("E-mail") },
     )
 }
 

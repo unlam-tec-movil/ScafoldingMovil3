@@ -26,6 +26,8 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.LoginScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.RegisterScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.feed.FeedScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostFoundPet
+import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostMissingPetScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.editProfile.EditProfile
@@ -51,6 +53,8 @@ class MainActivity :
 //                    color = MaterialTheme.colorScheme.background,
 //                ) {
                 AppNavHost()
+                //PostMissingPetScreen()
+                //PostFoundPet()
             }
         }
     }
