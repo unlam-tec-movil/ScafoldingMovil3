@@ -111,8 +111,23 @@ class MapViewModel
                 _isLoadingPins.value = false
             }
         }
+    init {
+        observePins()
+    }
 
-        /**
+    private fun observePins() {
+        viewModelScope.launch {
+            _isLoadingPins.value = true
+
+            pinRepository.observePins().collect { pinList ->
+                _pins.value = pinList
+                _isLoadingPins.value = false
+            }
+        }
+    }
+
+
+    /**
          * Guarda un nuevo pin.
          *
          * La UI solo pasa los datos primitivos. El ViewModel es responsable
@@ -138,9 +153,7 @@ class MapViewModel
                         title = title,
                         description = description,
                     )
-
-                val result = pinRepository.savePin(newPin)
-                result
+                pinRepository.savePin(newPin)
                     .onSuccess {
                         // Recargar la lista de pins para reflejar el cambio
                         loadPins()
@@ -155,8 +168,7 @@ class MapViewModel
          */
         fun deletePin(pinId: String) {
             viewModelScope.launch {
-                val result = pinRepository.deletePin(pinId)
-                result
+                pinRepository.deletePin(pinId)
                     .onSuccess {
                         // Recargar la lista de pins para reflejar el cambio
                         loadPins()
