@@ -22,14 +22,13 @@ import ar.edu.unlam.mobile.scaffolding.domain.loadMarkerDescriptorFromUrl
 import ar.edu.unlam.mobile.scaffolding.ui.components.AddPinDialog
 import ar.edu.unlam.mobile.scaffolding.ui.components.ShowPermissionDenied
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.accompanist.permissions.PermissionStatus
-import com.google.accompanist.permissions.rememberPermissionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -44,7 +43,6 @@ const val MAP_ROUTE = "map"
  * Observa estados del MapViewModel (StateFlow).
  * Arquitectura limpia: usa Pin del dominio y PinRepository.
  */
-
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
@@ -157,16 +155,17 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                         state = MarkerState(position),
                         icon = markerIcons[pin.id],
                         anchor = Offset(0.5f, 0.5f),
-                        title = "Mascota"
+                        title = "Mascota",
                     )
                 }
                 // carga asíncrona del icono
                 LaunchedEffect(pin.id, pin.imageUrl) {
                     if (!markerIcons.containsKey(pin.id)) {
-                        val desc = loadMarkerDescriptorFromUrl(
-                            context = context,
-                            url = pin.imageUrl
-                        )
+                        val desc =
+                            loadMarkerDescriptorFromUrl(
+                                context = context,
+                                url = pin.imageUrl,
+                            )
                         if (desc != null) {
                             markerIcons[pin.id] = desc
                         }
@@ -193,7 +192,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             onConfirm = {
                 // La UI solo pasa los datos.
                 viewModel.savePin(
-                    //TODO: modificar esto para que en vés de guardarlo por separado,
+                    // TODO: modificar esto para que en vés de guardarlo por separado,
                     // se guarde en la publicación del perro
                     latitude = pendingLatLng!!.latitude,
                     longitude = pendingLatLng!!.longitude,
@@ -204,6 +203,3 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         )
     }
 }
-
-
-

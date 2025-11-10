@@ -33,11 +33,9 @@ fun HomeScreen(
                 AsyncImage(
                     model = "https://as2.ftcdn.net/jpg/04/20/53/13/1000_F_420531310_w0Pcyga9y4bgQ1f4nQU0sS53C5k1V29H.jpg",
                     contentDescription = "Imagen de ejemplo",
-                    contentScale = ContentScale.Crop // opcional
+                    contentScale = ContentScale.Crop, // opcional
                 )
-
             }
-
         }
 
         is HelloMessageUIState.Error -> {

@@ -22,11 +22,11 @@ import com.google.accompanist.permissions.PermissionStatus
 
 @Composable
 @OptIn(ExperimentalPermissionsApi::class)
- fun ShowPermissionDenied(
+fun ShowPermissionDenied(
     isFirstLoad: Boolean,
     status: PermissionStatus.Denied,
     context: Context,
-    locationPermissionState: PermissionState
+    locationPermissionState: PermissionState,
 ) {
     if (isFirstLoad) {
         Box(

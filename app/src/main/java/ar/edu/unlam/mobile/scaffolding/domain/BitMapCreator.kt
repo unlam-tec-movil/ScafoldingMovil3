@@ -13,35 +13,38 @@ import coil.request.ImageRequest
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
-
 suspend fun loadMarkerDescriptorFromUrl(
     context: Context,
     url: String,
 ): BitmapDescriptor? {
     val loader = ImageLoader(context)
-    val req = ImageRequest.Builder(context)
-        .data(url)
-        .allowHardware(false)
-        .build()
+    val req =
+        ImageRequest
+            .Builder(context)
+            .data(url)
+            .allowHardware(false)
+            .build()
 
     val result = loader.execute(req).drawable ?: return null
     val bitmap = (result as BitmapDrawable).bitmap
     val circular = createCircularMarkerBitmap(bitmap)
-    return BitmapDescriptorFactory.fromBitmap(circular) }
+    return BitmapDescriptorFactory.fromBitmap(circular)
+}
 
 fun createCircularMarkerBitmap(avatarBitmap: Bitmap): Bitmap {
-    val size = 160            // tamaño total del marcador
-    val border = 10f          // grosor del borde
+    val size = 160
+    val border = 10f
 
     // bitmap final (el que va al marker)
     val out = createBitmap(size, size)
     val canvas = Canvas(out)
 
     // 1) dibujar borde fucsia
-    val borderPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = android.graphics.Color.MAGENTA
-        style = Paint.Style.FILL
-    }
+    val borderPaint =
+        Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            color = android.graphics.Color.MAGENTA
+            style = Paint.Style.FILL
+        }
     canvas.drawCircle(size / 2f, size / 2f, size / 2f, borderPaint)
 
     // 2) preparar el bitmap circular interno
@@ -55,14 +58,15 @@ fun createCircularMarkerBitmap(avatarBitmap: Bitmap): Bitmap {
     val avatarCanvas = Canvas(clippedAvatar)
 
     // recorte en círculo
-    val path = Path().apply {
-        addCircle(
-            innerSize / 2f,
-            innerSize / 2f,
-            innerSize / 2f,
-            Path.Direction.CCW,
-        )
-    }
+    val path =
+        Path().apply {
+            addCircle(
+                innerSize / 2f,
+                innerSize / 2f,
+                innerSize / 2f,
+                Path.Direction.CCW,
+            )
+        }
     avatarCanvas.clipPath(path)
     // ahora sí dibujamos la foto dentro del recorte
     avatarCanvas.drawBitmap(scaledAvatar, 0f, 0f, null)

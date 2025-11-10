@@ -15,16 +15,16 @@ import androidx.compose.ui.unit.dp
 fun AddPinDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-) { AlertDialog(
-    onDismissRequest = onDismiss,
-    title = { Text("Ubicación") },
-    text = {
-        Column {
-            Text("¿Guardar esta ubicación?")
-            Spacer(Modifier.height(8.dp))
-        }
-    },
-
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Ubicación") },
+        text = {
+            Column {
+                Text("¿Guardar esta ubicación?")
+                Spacer(Modifier.height(8.dp))
+            }
+        },
         confirmButton = {
             TextButton(onClick = onConfirm) { Text("Guardar") }
         },
@@ -36,6 +36,6 @@ fun AddPinDialog(
 
 @Preview
 @Composable
-fun Preview(){
-    AddPinDialog({},{})
+fun Preview() {
+    AddPinDialog({}, {})
 }
