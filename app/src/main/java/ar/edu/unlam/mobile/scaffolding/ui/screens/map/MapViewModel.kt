@@ -19,6 +19,16 @@ class MapViewModel
         private val locationRepository: LocationRepository,
         private val pinRepository: PinRepository,
     ) : ViewModel() {
+
+    private val _pets = MutableStateFlow<List<Pin>>(emptyList())
+    val pets: StateFlow<List<Pin>> = _pets
+
+    init {
+        viewModelScope.launch {
+           // _pets.value =
+            //TODO: Obtener todas las masacotas
+        }
+    }
         // ===== ESTADO DE UBICACIÓN =====
 
         /**
@@ -121,8 +131,6 @@ class MapViewModel
         fun savePin(
             latitude: Double,
             longitude: Double,
-            title: String,
-            description: String?,
         ) {
             viewModelScope.launch {
                 // El ViewModel crea el modelo del dominio con su lógica de negocio
@@ -135,8 +143,7 @@ class MapViewModel
                         // Lógica de generación de ID
                         latitude = latitude,
                         longitude = longitude,
-                        title = title,
-                        description = description,
+                        imageUrl = "https://firebasestorage.googleapis.com/v0/b/petfindermovil3.firebasestorage.app/o/pets%2Fd0392dd5-5e28-495b-99a4-f252389a3d12.jpg?alt=media&token=4f9ad98a-2613-44cb-8fc1-622869ade367"
                     )
 
                 val result = pinRepository.savePin(newPin)
@@ -153,6 +160,7 @@ class MapViewModel
         /**
          * Elimina un pin por su ID.
          */
+
         fun deletePin(pinId: String) {
             viewModelScope.launch {
                 val result = pinRepository.deletePin(pinId)

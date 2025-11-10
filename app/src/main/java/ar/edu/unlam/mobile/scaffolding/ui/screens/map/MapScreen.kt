@@ -1,35 +1,35 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens.map
 
-import android.content.Intent
-import android.net.Uri
-import android.provider.Settings
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import ar.edu.unlam.mobile.scaffolding.domain.loadMarkerDescriptorFromUrl
 import ar.edu.unlam.mobile.scaffolding.ui.components.AddPinDialog
+import ar.edu.unlam.mobile.scaffolding.ui.components.ShowPermissionDenied
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.accompanist.permissions.PermissionStatus
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
@@ -44,10 +44,13 @@ const val MAP_ROUTE = "map"
  * Observa estados del MapViewModel (StateFlow).
  * Arquitectura limpia: usa Pin del dominio y PinRepository.
  */
+
+
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     val context = LocalContext.current
+    val markerIcons = remember { mutableStateMapOf<String, BitmapDescriptor>() }
 
     // ===== OBSERVAR ESTADOS DEL VIEWMODEL =====
     val currentLocation by viewModel.currentLocation.collectAsState()
@@ -73,8 +76,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
 
     // ===== GESTIÓN DE PINS =====
     var pendingLatLng by remember { mutableStateOf<LatLng?>(null) }
-    var title by remember { mutableStateOf("") }
-    var snippet by remember { mutableStateOf("") }
 
     // Cargar pins desde el ViewModel al entrar
     LaunchedEffect(Unit) {
@@ -114,58 +115,9 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         is PermissionStatus.Denied -> {
             // Si es la primera carga, mostrar loading (no el mensaje)
             // Esto evita el "flash" del mensaje antes de que aparezca el diálogo del sistema
-            if (isFirstLoad) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator()
-                }
-                return
-            }
 
-            // Si ya no es primera carga (usuario rechazó), mostrar mensaje explicativo
-            val isBlocked = !status.shouldShowRationale
-
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.padding(16.dp),
-                ) {
-                    Text(
-                        text =
-                            if (isBlocked) {
-                                "Permiso de ubicación bloqueado.\nVe a Configuración para habilitarlo."
-                            } else {
-                                "Esta app necesita tu ubicación\npara mostrarte mascotas perdidas cerca de ti."
-                            },
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    )
-
-                    Button(
-                        onClick = {
-                            if (isBlocked) {
-                                // Abrir configuración de la app
-                                val intent =
-                                    Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                        data = Uri.fromParts("package", context.packageName, null)
-                                    }
-                                context.startActivity(intent)
-                            } else {
-                                // Volver a pedir el permiso
-                                locationPermissionState.launchPermissionRequest()
-                            }
-                        },
-                        modifier = Modifier.padding(top = 16.dp),
-                    ) {
-                        Text(if (isBlocked) "Abrir Configuración" else "Conceder permiso")
-                    }
-                }
-            }
-            return // No mostrar el mapa hasta que haya permiso
+            ShowPermissionDenied(isFirstLoad, status, context, locationPermissionState)
+            return
         }
         is PermissionStatus.Granted -> {
             // Permiso concedido, continuar con el mapa (código abajo)
@@ -191,18 +143,35 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             onMapLongClick = { latLng ->
                 // Abrir diálogo para agregar un nuevo pin
                 pendingLatLng = latLng
-                title = ""
-                snippet = ""
             },
         ) {
             // Renderizar pins (Observa desde ViewModel, usa modelo Pin del dominio)
             pins.forEach { pin ->
-                Marker(
-                    state = MarkerState(LatLng(pin.latitude, pin.longitude)),
-                    title = pin.title,
-                    snippet = pin.description,
-                    draggable = true,
-                )
+
+                val position = LatLng(pin.latitude, pin.longitude)
+                // si aún no tenemos el ícono de este pet, lo disparamos
+                val hasIcon = markerIcons.containsKey(pin.id)
+
+                if (hasIcon) {
+                    Marker(
+                        state = MarkerState(position),
+                        icon = markerIcons[pin.id],
+                        anchor = Offset(0.5f, 0.5f),
+                        title = "Mascota"
+                    )
+                }
+                // carga asíncrona del icono
+                LaunchedEffect(pin.id, pin.imageUrl) {
+                    if (!markerIcons.containsKey(pin.id)) {
+                        val desc = loadMarkerDescriptorFromUrl(
+                            context = context,
+                            url = pin.imageUrl
+                        )
+                        if (desc != null) {
+                            markerIcons[pin.id] = desc
+                        }
+                    }
+                }
             }
         }
 
@@ -218,19 +187,16 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     }
 
     // ========== DIÁLOGO PARA AGREGAR PIN ==========
+
     if (pendingLatLng != null) {
         AddPinDialog(
-            title = title,
-            onTitleChange = { title = it },
-            snippet = snippet,
-            onSnippetChange = { snippet = it },
             onConfirm = {
                 // La UI solo pasa los datos.
                 viewModel.savePin(
+                    //TODO: modificar esto para que en vés de guardarlo por separado,
+                    // se guarde en la publicación del perro
                     latitude = pendingLatLng!!.latitude,
                     longitude = pendingLatLng!!.longitude,
-                    title = title.ifBlank { "Marcador" },
-                    description = snippet.ifBlank { null },
                 )
                 pendingLatLng = null
             },
@@ -238,3 +204,6 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         )
     }
 }
+
+
+
