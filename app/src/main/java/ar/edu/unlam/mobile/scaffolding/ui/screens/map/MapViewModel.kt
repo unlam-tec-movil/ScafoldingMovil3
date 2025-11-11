@@ -19,6 +19,15 @@ class MapViewModel
         private val locationRepository: LocationRepository,
         private val pinRepository: PinRepository,
     ) : ViewModel() {
+        private val _pets = MutableStateFlow<List<Pin>>(emptyList())
+        val pets: StateFlow<List<Pin>> = _pets
+
+        init {
+            viewModelScope.launch {
+                // _pets.value =
+                // TODO: Obtener todas las masacotas
+            }
+        }
         // ===== ESTADO DE UBICACIÓN =====
 
         /**
@@ -136,8 +145,6 @@ class MapViewModel
         fun savePin(
             latitude: Double,
             longitude: Double,
-            title: String,
-            description: String?,
         ) {
             viewModelScope.launch {
                 // El ViewModel crea el modelo del dominio con su lógica de negocio
@@ -150,8 +157,7 @@ class MapViewModel
                         // Lógica de generación de ID
                         latitude = latitude,
                         longitude = longitude,
-                        title = title,
-                        description = description,
+                        imageUrl = "https://cdn.pixabay.com/photo/2023/04/28/12/18/dogs-7956516_640.jpg",
                     )
                 pinRepository
                     .savePin(newPin)
@@ -167,6 +173,7 @@ class MapViewModel
         /**
          * Elimina un pin por su ID.
          */
+
         fun deletePin(pinId: String) {
             viewModelScope.launch {
                 pinRepository

@@ -8,8 +8,7 @@ data class PlacePin(
         java.util.UUID
             .randomUUID()
             .toString(),
-    val lat: Double = 0.0,
-    val lng: Double = 0.0,
-    val title: String = "",
-    val snippet: String? = null,
+    val lat: Double,
+    val lng: Double,
+    val imageURL: String,
 )
