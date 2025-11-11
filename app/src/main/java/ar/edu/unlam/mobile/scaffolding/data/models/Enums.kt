@@ -22,3 +22,8 @@ enum class Gender(
     FEMALE("Hembra"),
     UNKNOWN("No lo sé"),
 }
+
+enum class TipoDePublicacion {
+    MASCOTAPERDIDA,
+    MASCOTAENCONTRADA,
+}

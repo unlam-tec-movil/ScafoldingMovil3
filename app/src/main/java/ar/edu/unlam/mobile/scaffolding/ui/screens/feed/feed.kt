@@ -1,5 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens.feed
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
@@ -66,10 +67,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import ar.edu.unlam.mobile.scaffolding.data.models.Gender
 import ar.edu.unlam.mobile.scaffolding.data.models.Pet
 import ar.edu.unlam.mobile.scaffolding.data.models.Status
+import ar.edu.unlam.mobile.scaffolding.data.models.TipoDePublicacion
 import ar.edu.unlam.mobile.scaffolding.data.models.Type
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostCard
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
@@ -80,15 +82,16 @@ import ar.edu.unlam.mobile.scaffolding.ui.theme.SoftGray
 import kotlin.String
 import kotlin.Unit
 
-//const val FEED_SCREEN_ROUTE = "feed"
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FeedScreen(viewModel: PostViewModel = hiltViewModel()) {
+fun FeedScreen(
+    navController: NavController,
+    postViewModel: PostViewModel,
+) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
     var showSheet by remember { mutableStateOf(false) }
-    val status by viewModel.statusFilter.collectAsState()
-    val pets by viewModel.filteredPets.collectAsState()
+    val status by postViewModel.statusFilter.collectAsState()
+    val pets by postViewModel.filteredPets.collectAsState()
 
     Box(
         modifier =
@@ -121,10 +124,9 @@ fun FeedScreen(viewModel: PostViewModel = hiltViewModel()) {
                     Modifier
                         .padding(horizontal = 16.dp),
             ) {
-
                 PerdidosEncontradosButtons(
                     selected = status,
-                    onSelected = { viewModel.setStatusFilter(it) }
+                    onSelected = { postViewModel.setStatusFilter(it) },
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 FilterButton(onClick = { showSheet = true })
@@ -137,6 +139,8 @@ fun FeedScreen(viewModel: PostViewModel = hiltViewModel()) {
                 Modifier
                     .align(Alignment.BottomEnd)
                     .padding(end = 16.dp, bottom = 130.dp),
+            navController = navController,
+            viewModel = postViewModel,
         )
     }
 
@@ -147,7 +151,10 @@ fun FeedScreen(viewModel: PostViewModel = hiltViewModel()) {
             dragHandle = null,
             modifier = Modifier.fillMaxHeight(0.9f),
         ) {
-            FilterContent(onClose = { showSheet = false })
+            FilterContent(
+                onClose = { showSheet = false },
+                viewModel = postViewModel,
+            )
         }
     }
 }
@@ -185,7 +192,7 @@ fun FilterButton(onClick: () -> Unit) {
 @Composable
 fun FilterContent(
     onClose: () -> Unit,
-    viewModel: PostViewModel = hiltViewModel()
+    viewModel: PostViewModel,
 ) {
     val currentType by viewModel.typeFilter.collectAsState()
     val currentGender by viewModel.genderFilter.collectAsState()
@@ -196,10 +203,11 @@ fun FilterContent(
     var locality by remember { mutableStateOf(currentLocality ?: "") }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color.White)
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .background(Color.White)
+                .padding(16.dp),
     ) {
         Text(
             "Filtrar por:",
@@ -277,8 +285,6 @@ fun FilterContent(
         }
     }
 }
-
-
 
 @Composable
 fun Locality(
@@ -384,39 +390,41 @@ fun GenderButtons(
         }
     }
 }
+
 @Composable
 fun PerdidosEncontradosButtons(
     selected: Status,
-    onSelected: (Status) -> Unit
+    onSelected: (Status) -> Unit,
 ) {
     val isPerdidos = selected == Status.LOST
     val isEncontrados = selected == Status.FOUND
 
     val colorPerdidosBackground by animateColorAsState(
         if (isPerdidos) ColorTwo else Color.White,
-        tween(400)
+        tween(400),
     )
     val colorPerdidosText by animateColorAsState(
         if (isPerdidos) Color.White else ColorTwo,
-        tween(400)
+        tween(400),
     )
 
     val colorEncontradosBackground by animateColorAsState(
         if (isEncontrados) ColorTwo else Color.White,
-        tween(400)
+        tween(400),
     )
     val colorEncontradosText by animateColorAsState(
         if (isEncontrados) Color.White else ColorTwo,
-        tween(400)
+        tween(400),
     )
 
     Button(
         onClick = { onSelected(Status.LOST) },
         shape = RoundedCornerShape(50.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = colorPerdidosBackground,
-            contentColor = colorPerdidosText
-        )
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = colorPerdidosBackground,
+                contentColor = colorPerdidosText,
+            ),
     ) {
         Text("Perdidos")
     }
@@ -424,15 +432,15 @@ fun PerdidosEncontradosButtons(
     Button(
         onClick = { onSelected(Status.FOUND) },
         shape = RoundedCornerShape(50.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = colorEncontradosBackground,
-            contentColor = colorEncontradosText
-        )
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = colorEncontradosBackground,
+                contentColor = colorEncontradosText,
+            ),
     ) {
         Text("Encontrados")
     }
 }
-
 
 @Composable
 fun AppName(modifier: Modifier = Modifier) {
@@ -468,7 +476,11 @@ fun CirXD(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun PublishButton(modifier: Modifier = Modifier) {
+fun PublishButton(
+    modifier: Modifier = Modifier,
+    navController: NavController,
+    viewModel: PostViewModel,
+) {
     var expanded by remember { mutableStateOf(false) }
     val rotation by animateFloatAsState(
         targetValue = if (expanded) 45f else 0f,
@@ -503,7 +515,12 @@ fun PublishButton(modifier: Modifier = Modifier) {
                         .background(ColorTwo.copy(alpha = 0.9f), RoundedCornerShape(16.dp))
                         .padding(12.dp),
             ) {
-                TextButton(onClick = { /* TODO */ }) {
+                TextButton(onClick = {
+                    viewModel.setPostTipo(TipoDePublicacion.MASCOTAPERDIDA)
+                    Log.d("DEBUG", "VM PublishButton: ${viewModel.hashCode()}")
+
+                    navController.navigate("map_post_screen")
+                }) {
                     Icon(
                         imageVector = Icons.Default.HeartBroken,
                         contentDescription = "Perdí a mi mascota",
@@ -512,7 +529,10 @@ fun PublishButton(modifier: Modifier = Modifier) {
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Perdí a mi mascota", color = Color.White)
                 }
-                TextButton(onClick = { /* TODO */ }) {
+                TextButton(onClick = {
+                    viewModel.setPostTipo(TipoDePublicacion.MASCOTAENCONTRADA)
+                    navController.navigate("map_post_screen")
+                }) {
                     Icon(
                         imageVector = Icons.Default.Visibility,
                         contentDescription = "Vi una mascota perdida",

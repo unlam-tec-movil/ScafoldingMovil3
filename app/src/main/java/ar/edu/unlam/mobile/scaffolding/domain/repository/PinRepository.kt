@@ -22,8 +22,6 @@ interface PinRepository {
      */
     suspend fun deletePin(pinId: String): Result<Unit>
 
-    //observa pines en tiempo real
+    // observa pines en tiempo real
     fun observePins(): Flow<List<Pin>>
-
-
 }

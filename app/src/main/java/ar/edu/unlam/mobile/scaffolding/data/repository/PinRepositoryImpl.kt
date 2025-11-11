@@ -67,12 +67,9 @@ class PinRepositoryImpl
                 Result.failure(e)
             }
 
-        //Devuelve la lista de pines en tiempo real
-        override fun observePins(): Flow<List<Pin>> {
-        return pinRemoteDataSource.observePins().map { placePinList: List<PlacePin> ->
-            placePinList.map { it.toDomain() }
-        }
+        // Devuelve la lista de pines en tiempo real
+        override fun observePins(): Flow<List<Pin>> =
+            pinRemoteDataSource.observePins().map { placePinList: List<PlacePin> ->
+                placePinList.map { it.toDomain() }
+            }
     }
-
-}
-

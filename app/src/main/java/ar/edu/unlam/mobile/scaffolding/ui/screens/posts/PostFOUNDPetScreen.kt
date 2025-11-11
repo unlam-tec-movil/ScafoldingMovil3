@@ -35,7 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import ar.edu.unlam.mobile.scaffolding.data.models.Gender
 import ar.edu.unlam.mobile.scaffolding.data.models.Pet
 import ar.edu.unlam.mobile.scaffolding.data.models.Status
@@ -45,9 +45,8 @@ import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorTwo
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PostFoundPet(
-    onBackClick: () -> Unit = {},
-    onFinishClick: () -> Unit = {},
-    viewModel: PostViewModel = hiltViewModel(),
+    navController: NavController,
+    postViewModel: PostViewModel,
 ) {
     val context = LocalContext.current
 
@@ -74,10 +73,8 @@ fun PostFoundPet(
         Scaffold(
             topBar = {
                 PostMissingPetTopBar(
-                    onBackClick = onBackClick,
+                    onBackClick = { navController.popBackStack() },
                     onFinishClick = {
-                        Log.d("PostScreen", "Botón Finalizar clickeado")
-
                         if (
                             seenAt.isNotBlank() &&
                             locality.isNotBlank() &&
@@ -91,17 +88,21 @@ fun PostFoundPet(
                                     locality = locality,
                                     gender = selectedGender!!,
                                     type = selectedType!!,
-                                    status = Status.FOUND
+                                    status = Status.FOUND,
                                 )
+
                             Log.d("PostScreen", "Datos de mascota listos: $pet")
 
-                            viewModel.savePet(pet, photoUri) { message ->
+                            postViewModel.savePet(pet, photoUri) { message ->
                                 Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-                                onFinishClick()
+
+                                navController.navigate("feed") {
+                                    popUpTo("feed_screen") { inclusive = true }
+                                    launchSingleTop = true
+                                }
                             }
                         } else {
                             Toast.makeText(context, "Faltan completar campos", Toast.LENGTH_SHORT).show()
-                            Log.e("PostScreen", "Campos faltantes")
                         }
                     },
                 )

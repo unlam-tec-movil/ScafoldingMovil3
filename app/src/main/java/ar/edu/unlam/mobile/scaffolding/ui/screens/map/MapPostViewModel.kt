@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class MapViewModel
+class MapPostViewModel
     @Inject
     constructor(
         private val locationRepository: LocationRepository,
@@ -77,56 +77,6 @@ class MapViewModel
             }
         }
 
-        // ===== ESTADO DE PINS =====
-
-        /**
-         * Lista de pins guardados en el mapa.
-         * Trabaja con el modelo Pin del DOMINIO.
-         */
-        private val _pins = MutableStateFlow<List<Pin>>(emptyList())
-        val pins: StateFlow<List<Pin>> = _pins
-
-        /**
-         * Indica si se están cargando los pins.
-         */
-        private val _isLoadingPins = MutableStateFlow(false)
-        val isLoadingPins: StateFlow<Boolean> = _isLoadingPins
-
-        /**
-         * Carga todos los pins guardados desde el repositorio.
-         */
-        fun loadPins() {
-            viewModelScope.launch {
-                _isLoadingPins.value = true
-
-                val result = pinRepository.getAllPins()
-                result
-                    .onSuccess { pinList ->
-                        _pins.value = pinList
-                    }.onFailure {
-                        _pins.value = emptyList()
-                        // TODO: Emitir evento de error
-                    }
-
-                _isLoadingPins.value = false
-            }
-        }
-
-        init {
-            observePins()
-        }
-
-        private fun observePins() {
-            viewModelScope.launch {
-                _isLoadingPins.value = true
-
-                pinRepository.observePins().collect { pinList ->
-                    _pins.value = pinList
-                    _isLoadingPins.value = false
-                }
-            }
-        }
-
         /**
          * Guarda un nuevo pin.
          *
@@ -153,14 +103,13 @@ class MapViewModel
                         title = title,
                         description = description,
                     )
-                pinRepository
-                    .savePin(newPin)
-                    .onSuccess {
-                        // Recargar la lista de pins para reflejar el cambio
-                        loadPins()
-                    }.onFailure {
-                        // TODO: Emitir evento de error
-                    }
+                pinRepository.savePin(newPin)
+//                .onSuccess {
+                // Recargar la lista de pins para reflejar el cambio
+                // loadPins()
+//                }.onFailure {
+//                    // TODO: Emitir evento de error
+//                }
             }
         }
 
@@ -173,7 +122,7 @@ class MapViewModel
                     .deletePin(pinId)
                     .onSuccess {
                         // Recargar la lista de pins para reflejar el cambio
-                        loadPins()
+//                    loadPins()
                     }.onFailure {
                         // TODO: Emitir evento de error
                     }

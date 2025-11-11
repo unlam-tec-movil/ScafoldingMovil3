@@ -1,21 +1,14 @@
 package ar.edu.unlam.mobile.scaffolding.data.datasources.local
 
 import android.content.Context
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import ar.edu.unlam.mobile.scaffolding.data.models.PlacePin
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.first
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-//// Extensión de DataStore para Context
-//private val Context.pinsDataStore by preferencesDataStore("map_pins_ds")
-//private val PINS_JSON_KEY = stringPreferencesKey("pins_json")
+// // Extensión de DataStore para Context
+// private val Context.pinsDataStore by preferencesDataStore("map_pins_ds")
+// private val PINS_JSON_KEY = stringPreferencesKey("pins_json")
 //
-///**
+// /**
 // * DataSource que maneja la persistencia local de pins usando DataStore.
 // *
 // * Esta clase encapsula TODA la lógica de acceso a datos local:
@@ -23,11 +16,11 @@ import javax.inject.Inject
 // * - Serialización/Deserialización JSON
 // * - Operaciones de lectura/escritura
 // */
-//class PinLocalDataSource
-//    @Inject
-//    constructor(
-//        @ApplicationContext private val context: Context,
-//    ) {
+class PinLocalDataSource
+    @Inject
+    constructor(
+        @ApplicationContext private val context: Context,
+    ) {
 //        /**
 //         * Obtiene todos los pins guardados en DataStore.
 //         */
@@ -53,4 +46,4 @@ import javax.inject.Inject
 //            } catch (e: Exception) {
 //                false
 //            }
-//    }
+    }
