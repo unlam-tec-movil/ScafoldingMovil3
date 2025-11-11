@@ -233,10 +233,6 @@ fun MapPostScreen(
     // ======= DIÁLOGO PARA AGREGAR PIN =======
     if (pendingLatLng != null) {
         AddPinDialog(
-            title = title,
-            onTitleChange = { title = it },
-            snippet = snippet,
-            onSnippetChange = { snippet = it },
             onConfirm = {
                 viewModel.savePin(
                     latitude = pendingLatLng!!.latitude,
