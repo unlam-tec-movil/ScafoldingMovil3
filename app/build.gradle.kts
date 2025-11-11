@@ -93,6 +93,7 @@ dependencies {
 
     // ========== DAGGER HILT ==========
     implementation(libs.google.dagger.hilt.android)
+    implementation(libs.androidx.compose.ui.text)
     ksp(libs.google.dagger.hilt.android.compiler)
     implementation(libs.google.dagger.hilt.android.testing)
     implementation(libs.androidx.hilt.navigation.compose)

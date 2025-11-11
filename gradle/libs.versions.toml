@@ -29,6 +29,7 @@ mapsCompose = "6.1.0"
 navigationCompose = "2.8.5"
 datastorePreferences = "1.1.1"
 accompanistPermissions = "0.34.0"
+uiText = "1.9.4"
 
 
 
@@ -77,6 +78,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose"
 
 # Accompanist
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
+androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
 
 
 [plugins]
