@@ -10,6 +10,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
@@ -94,14 +95,13 @@ class MapPostViewModel
                 val newPin =
                     Pin(
                         id =
-                            java.util.UUID
+                            UUID
                                 .randomUUID()
                                 .toString(),
                         // Lógica de generación de ID
                         latitude = latitude,
                         longitude = longitude,
-                        title = title,
-                        description = description,
+                        imageUrl = TODO(),
                     )
                 pinRepository.savePin(newPin)
 //                .onSuccess {
