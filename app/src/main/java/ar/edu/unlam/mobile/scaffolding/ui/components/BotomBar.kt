@@ -10,7 +10,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
@@ -33,6 +33,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MAP_ROUTE
+
+data class BottomNavItem(
+    val matchRoute: String,
+    val navigateRoute: String,
+    val icon: androidx.compose.ui.graphics.vector.ImageVector,
+    val label: String,
+)
 
 @Composable
 fun BottomBar(

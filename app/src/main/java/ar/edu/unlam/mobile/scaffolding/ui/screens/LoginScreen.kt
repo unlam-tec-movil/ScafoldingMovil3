@@ -34,6 +34,8 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -51,6 +53,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.mobile.scaffolding.R
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorOne
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorTwo
@@ -58,13 +61,20 @@ import ar.edu.unlam.mobile.scaffolding.ui.theme.DarkBlue
 import ar.edu.unlam.mobile.scaffolding.ui.theme.PetFinderFont
 import kotlin.math.min
 
-const val LOGIN_SCREEN_ROUTE = "login"
-
 @Composable
 fun LoginScreen(
     onRegisterClick: () -> Unit,
     onLoginSuccess: () -> Unit,
+    viewModel: LoginViewModel = hiltViewModel(),
 ) {
+    val loginResult by viewModel.loginResult.collectAsState()
+
+    LaunchedEffect(loginResult) {
+        if (loginResult == true) {
+            onLoginSuccess()
+        }
+    }
+
     Box(
         modifier =
             Modifier
@@ -85,7 +95,9 @@ fun LoginScreen(
 
         LoginCard(
             onRegisterClick = onRegisterClick,
-            onLoginClick = onLoginSuccess,
+            onLoginClick = { email, password ->
+                viewModel.login(email, password)
+            },
         )
     }
 }
@@ -93,12 +105,12 @@ fun LoginScreen(
 @Composable
 fun LoginCard(
     onRegisterClick: () -> Unit,
-    onLoginClick: () -> Unit,
+    onLoginClick: (String, String) -> Unit,
 ) {
     var isFocused by remember { mutableStateOf(false) }
     var isFocusedPassword by remember { mutableStateOf(false) }
-    var texto by remember { mutableStateOf("") }
-    var textoPassword by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
 
     Box(
@@ -112,13 +124,13 @@ fun LoginCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
         ) {
-            DogsFace(textLength = texto.length, isFocused = isFocused)
+            DogsFace(textLength = email.length, isFocused = isFocused)
             Spacer(modifier = Modifier.height(2.dp))
 
             Box(contentAlignment = Alignment.Center) {
                 CampoDeTexto(
-                    texto = texto,
-                    onTextChange = { texto = it },
+                    texto = email,
+                    onTextChange = { email = it },
                     onFocusChange = { focused -> isFocused = focused },
                 )
                 Hands(
@@ -131,8 +143,8 @@ fun LoginCard(
             Spacer(modifier = Modifier.height(2.dp))
 
             CampoDeContrasenia(
-                texto = textoPassword,
-                onTextChange = { textoPassword = it },
+                texto = password,
+                onTextChange = { password = it },
                 isVisible = isPasswordVisible,
                 onVisibilityChange = { isPasswordVisible = it },
                 onFocusChange = { focused -> isFocusedPassword = focused },
@@ -150,7 +162,7 @@ fun LoginCard(
         ) {
             LoginButton(
                 onRegisterClick = onRegisterClick,
-                onLoginClick = onLoginClick,
+                onLoginClick = { onLoginClick(email, password) },
             )
         }
     }
@@ -162,7 +174,7 @@ fun LoginButton(
     onRegisterClick: () -> Unit,
 ) {
     Button(
-        onClick = { onLoginClick() },
+        onClick = onLoginClick,
         modifier =
             Modifier
                 .fillMaxWidth()
@@ -359,7 +371,7 @@ fun CampoDeTexto(
                 .padding(horizontal = 20.dp)
                 .fillMaxWidth()
                 .onFocusChanged { focusState -> onFocusChange(focusState.isFocused) },
-        placeholder = { Text("Usuario") },
+        placeholder = { Text("E-mail") },
     )
 }
 

@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,11 +26,16 @@ import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.screens.LoginScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.RegisterScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.feed.FeedScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapPostScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostFoundPet
+import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostMissingPetScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.editProfile.EditProfile
+import ar.edu.unlam.mobile.scaffolding.ui.screens.userPosts.MyPetsScreen
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ScaffoldingV2Theme
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -37,12 +43,10 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity :
     ComponentActivity(),
     ActivityResultCallback<Any> {
-    private lateinit var viewModel: PostViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
+        FirebaseApp.initializeApp(this)
         super.onCreate(savedInstanceState)
-        viewModel = PostViewModel()
         setContent {
             ScaffoldingV2Theme {
                 // A surface container using the 'background' color from the theme
@@ -51,6 +55,8 @@ class MainActivity :
 //                    color = MaterialTheme.colorScheme.background,
 //                ) {
                 AppNavHost()
+                // PostMissingPetScreen()
+                // PostFoundPet()
             }
         }
     }
@@ -81,6 +87,7 @@ class MainActivity :
 fun MainScreen() {
     val controller = rememberNavController()
     val snackBarHostState = remember { SnackbarHostState() }
+    val postViewModel = hiltViewModel<PostViewModel>()
 
     Scaffold(
         bottomBar = {
@@ -107,7 +114,19 @@ fun MainScreen() {
             modifier = Modifier.padding(paddingValue),
         ) {
             composable("feed") {
-                FeedScreen()
+                FeedScreen(navController = controller, postViewModel = postViewModel)
+            }
+
+            composable("map_post_screen") {
+                MapPostScreen(navController = controller, postViewModel = postViewModel)
+            }
+
+            composable("post_missing_pet_screen") {
+                PostMissingPetScreen(navController = controller, postViewModel = postViewModel)
+            }
+
+            composable("post_found_pet_screen") {
+                PostFoundPet(navController = controller, postViewModel = postViewModel)
             }
 
             composable("map") {
@@ -116,6 +135,10 @@ fun MainScreen() {
 
             composable("edit") {
                 EditProfile(controller)
+            }
+
+            composable("misposts") {
+                MyPetsScreen()
             }
 
             composable(
@@ -161,23 +184,6 @@ fun AppNavHost() {
         navController = nav,
         startDestination = startDestination,
     ) {
-//
-//        composable("splash") {
-//            Splash(
-//                onFinish = {
-//                    val next = if (FirebaseAuth.getInstance().currentUser != null) {
-//                        "main"
-//                    } else {
-//                        "login"
-//                    }
-//
-//                    nav.navigate(next) {
-//                        popUpTo("splash") { inclusive = true }
-//                    }
-//                }
-//            )
-//        }
-
         composable("login") {
             LoginScreen(
                 onRegisterClick = { nav.navigate("register") },
@@ -205,126 +211,3 @@ fun AppNavHost() {
         }
     }
 }
-
-// @OptIn(ExperimentalMaterial3Api::class)
-// @Composable
-// fun MainScreen() {
-//    // Controller es el elemento que nos permite navegar entre pantallas. Tiene las acciones
-//    // para navegar como naviegate y también la información de en dónde se "encuentra" el usuario
-//    // a través del back stack
-//    val controller = rememberNavController()
-//    val snackBarHostState = remember { SnackbarHostState() }
-//    val currentBackStackEntry = controller.currentBackStackEntryAsState()
-//    val currentRoute = currentBackStackEntry.value?.destination?.route
-//    val showBottomBar = currentRoute != "splash"
-//
-//    Scaffold(
-// //        topBar = {
-// //            TopAppBar(
-// //                title = { Text("Petapp pa") },
-// //                navigationIcon = {
-// //                    Button(onClick = {}, modifier = Modifier) {
-// //                        Icon(
-// //                            imageVector = Icons.Default.Menu,
-// //                            contentDescription = "Filters",
-// //                        )
-// //                    }
-// //                },
-// //            )
-// //        },
-//
-//        bottomBar ={
-//            if (showBottomBar && currentRoute != "login" && currentRoute != "register") {
-//                 BottomBar(
-//                     controller = controller,
-//                     )
-//            }
-//            },
-// //        floatingActionButton = {
-// //            IconButton(onClick = { controller.navigate("home") }) {
-// //                var icon by remember { mutableStateOf(Icons.Default.Add) }
-// //
-// //                Icon(
-// //                    icon,
-// //                    contentDescription = "Home",
-// //                    Modifier.clickable {
-// //                        if (icon == Icons.Default.Add) {
-// //                            icon = Icons.Default.Close
-// //                        } else {
-// //                            icon = Icons.Default.Add
-// //                        }
-// //                    },
-// //                )
-// //            }
-// //        },
-//        snackbarHost = {
-//            SnackbarHost(snackBarHostState) { data ->
-//                // custom snackbar with the custom action button color and border
-//                val isError = (data.visuals as? SnackbarVisualsWithError)?.isError ?: false
-//                val buttonColor =
-//                    if (isError) {
-//                        ButtonDefaults.textButtonColors(
-//                            containerColor = MaterialTheme.colorScheme.errorContainer,
-//                            contentColor = MaterialTheme.colorScheme.error,
-//                        )
-//                    } else {
-//                        ButtonDefaults.textButtonColors(
-//                            contentColor = MaterialTheme.colorScheme.inversePrimary,
-//                        )
-//                    }
-//
-//                Snackbar(
-//                    modifier =
-//                        Modifier.border(2.dp, MaterialTheme.colorScheme.secondary).padding(12.dp),
-//                    action = {
-//                        TextButton(
-//                            onClick = { if (isError) data.dismiss() else data.performAction() },
-//                            colors = buttonColor,
-//                        ) {
-//                            Text(data.visuals.actionLabel ?: "")
-//                        }
-//                    },
-//                ) {
-//                    Text(data.visuals.message)
-//                }
-//            }
-//        },
-//    ) { paddingValue ->
-//        // NavHost es el componente que funciona como contenedor de los otros componentes que
-//        // podrán ser destinos de navegación.
-//        NavHost(navController = controller, startDestination = LOGIN_SCREEN_ROUTE) {
-//            // composable es el componente que se usa para definir un destino de navegación.
-//            // Por parámetro recibe la ruta que se utilizará para navegar a dicho destino.
-//
-//            composable("login") {
-//                // Home es el componente en sí que es el destino de navegación.
-//                HomeScreen(modifier = Modifier.padding(paddingValue))
-//            }
-//
-//            composable("login") {
-//                LoginScreen(
-//                    onRegisterClick = {
-//                        controller.navigate("register")
-//                    },
-//                    onLoginSuccess = {
-//                        controller.navigate("main") {
-//                            popUpTo("login") { inclusive = true }
-//                        }
-//                    }
-//                )
-//
-//            }
-//
-//            composable(
-//                route = "user/{id}",
-//                arguments = listOf(navArgument("id") { type = NavType.StringType }),
-//            ) { navBackStackEntry ->
-//                val id = navBackStackEntry.arguments?.getString("id") ?: "1"
-//                UserScreen(controller)
-//            }
-//            composable("edit") {
-//                EditProfile(controller)
-//            }
-//        }
-//    }
-// }
