@@ -144,9 +144,31 @@ fun MainScreen() {
             composable(
                 "user/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
-            ) {
-                UserScreen(controller)
+            ) { backStackEntry ->
+                val id = backStackEntry.arguments?.getString("id") ?: ""
+                UserScreen(
+                    onDetallesClick = { /* si necesitás navegar a detalles personales */ },
+                    onMascotasClick = { controller.navigate("mis_mascotas/$id") },
+                    onReportesClick = { controller.navigate("mis_reportes/$id") },
+                    onLogoutClick = {
+                        FirebaseAuth.getInstance().signOut()
+                        controller.navigate("login") {
+                            popUpTo("main") { inclusive = true }
+                        }
+                    },
+                )
             }
+
+            // Opcional: rutas destino para mascotas/reportes
+            composable(
+                "mis_mascotas/{userId}",
+                arguments = listOf(navArgument("userId") { type = NavType.StringType }),
+            ) { /* MisMascotasScreen(controller) */ }
+
+            composable(
+                "mis_reportes/{userId}",
+                arguments = listOf(navArgument("userId") { type = NavType.StringType }),
+            ) { /* MisReportesScreen(controller) */ }
         }
     }
 }
