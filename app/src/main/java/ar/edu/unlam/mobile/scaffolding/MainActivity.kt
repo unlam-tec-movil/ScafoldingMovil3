@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -25,11 +26,16 @@ import ar.edu.unlam.mobile.scaffolding.ui.components.BottomBar
 import ar.edu.unlam.mobile.scaffolding.ui.screens.LoginScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.RegisterScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.feed.FeedScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapPostScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostFoundPet
+import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostMissingPetScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.editProfile.EditProfile
+import ar.edu.unlam.mobile.scaffolding.ui.screens.userPosts.MyPetsScreen
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ScaffoldingV2Theme
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -37,12 +43,10 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity :
     ComponentActivity(),
     ActivityResultCallback<Any> {
-    private lateinit var viewModel: PostViewModel
-
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
+        FirebaseApp.initializeApp(this)
         super.onCreate(savedInstanceState)
-        viewModel = PostViewModel()
         setContent {
             ScaffoldingV2Theme {
                 // A surface container using the 'background' color from the theme
@@ -51,6 +55,8 @@ class MainActivity :
 //                    color = MaterialTheme.colorScheme.background,
 //                ) {
                 AppNavHost()
+                // PostMissingPetScreen()
+                // PostFoundPet()
             }
         }
     }
@@ -81,6 +87,7 @@ class MainActivity :
 fun MainScreen() {
     val controller = rememberNavController()
     val snackBarHostState = remember { SnackbarHostState() }
+    val postViewModel = hiltViewModel<PostViewModel>()
 
     Scaffold(
         bottomBar = {
@@ -107,7 +114,19 @@ fun MainScreen() {
             modifier = Modifier.padding(paddingValue),
         ) {
             composable("feed") {
-                FeedScreen()
+                FeedScreen(navController = controller, postViewModel = postViewModel)
+            }
+
+            composable("map_post_screen") {
+                MapPostScreen(navController = controller, postViewModel = postViewModel)
+            }
+
+            composable("post_missing_pet_screen") {
+                PostMissingPetScreen(navController = controller, postViewModel = postViewModel)
+            }
+
+            composable("post_found_pet_screen") {
+                PostFoundPet(navController = controller, postViewModel = postViewModel)
             }
 
             composable("map") {
@@ -116,6 +135,10 @@ fun MainScreen() {
 
             composable("edit") {
                 EditProfile(controller)
+            }
+
+            composable("misposts") {
+                MyPetsScreen()
             }
 
             composable(

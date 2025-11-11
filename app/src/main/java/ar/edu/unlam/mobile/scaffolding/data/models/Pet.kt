@@ -10,29 +10,6 @@ data class Pet(
     val seenAt: String = "",
     val locality: String = "",
     val imageUrl: String = "",
+    val phoneNumber: String = "",
+    val ownerId: String = "",
 )
-
-// data class Status(
-//    val description: String,
-//    val id: Integer,
-// )
-//
-// data class Type(
-//    val name: String,
-//    val id: Integer,
-// )
-
-// data class Color(
-//    val name: String,
-//    val id: Integer,
-// )
-//
-// data class Hair(
-//    val name: String,
-//    val id: Integer,
-// )
-//
-// data class gender(
-//    val description: String,
-//    val id: Integer,
-// )

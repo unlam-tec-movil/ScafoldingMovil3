@@ -31,4 +31,10 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindPinRepository(impl: PinRepositoryImpl): PinRepository
+
+//    @Binds
+//    @Singleton
+//    abstract fun bindUserRepository(
+//        impl: UserRepositoryImpl
+//    ): UserRepository
 }
