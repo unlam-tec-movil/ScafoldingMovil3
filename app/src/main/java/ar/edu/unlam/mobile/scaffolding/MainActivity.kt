@@ -31,8 +31,8 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.petdetail.PetDetailScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostFoundPet
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostMissingPetScreen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.search.SearchScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
+import ar.edu.unlam.mobile.scaffolding.ui.screens.search.SearchScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.editProfile.EditProfile
 import ar.edu.unlam.mobile.scaffolding.ui.screens.userPosts.MyPetsScreen
