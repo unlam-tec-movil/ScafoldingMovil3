@@ -1,9 +1,5 @@
 package ar.edu.unlam.mobile.scaffolding.data.dto
 
-import ar.edu.unlam.mobile.scaffolding.data.dto.Gender
-import ar.edu.unlam.mobile.scaffolding.data.dto.Status
-import ar.edu.unlam.mobile.scaffolding.data.dto.Type
-
 /**
  * Data Transfer Object (DTO) para Pet.
  *
