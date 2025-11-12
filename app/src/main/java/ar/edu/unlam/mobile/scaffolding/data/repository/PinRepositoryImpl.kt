@@ -1,9 +1,9 @@
 package ar.edu.unlam.mobile.scaffolding.data.repository
 
 import ar.edu.unlam.mobile.scaffolding.data.datasources.local.PinRemoteDataSource
+import ar.edu.unlam.mobile.scaffolding.data.dto.PlacePin
 import ar.edu.unlam.mobile.scaffolding.data.mappers.toData
 import ar.edu.unlam.mobile.scaffolding.data.mappers.toDomain
-import ar.edu.unlam.mobile.scaffolding.data.models.PlacePin
 import ar.edu.unlam.mobile.scaffolding.domain.model.Pin
 import ar.edu.unlam.mobile.scaffolding.domain.repository.PinRepository
 import kotlinx.coroutines.flow.Flow

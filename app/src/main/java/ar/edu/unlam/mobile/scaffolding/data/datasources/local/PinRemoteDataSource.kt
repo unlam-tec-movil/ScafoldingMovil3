@@ -1,6 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.data.datasources.local
 
-import ar.edu.unlam.mobile.scaffolding.data.models.PlacePin
+import ar.edu.unlam.mobile.scaffolding.data.dto.PlacePin
 import com.google.firebase.firestore.FirebaseFirestore
 import jakarta.inject.Inject
 import kotlinx.coroutines.channels.awaitClose

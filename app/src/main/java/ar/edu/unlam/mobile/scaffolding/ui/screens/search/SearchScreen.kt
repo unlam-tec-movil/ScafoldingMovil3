@@ -41,7 +41,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import ar.edu.unlam.mobile.scaffolding.R
-import ar.edu.unlam.mobile.scaffolding.domain.model.Pet
 import ar.edu.unlam.mobile.scaffolding.domain.model.SearchMode
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
@@ -68,45 +67,16 @@ const val SEARCH_ROUTE = "search"
  * - Ubicación de la mascota (marker rojo)
  * - Flecha roja que apunta hacia la mascota (modo RADAR)
  *
- * @param petId ID de la mascota que se está buscando.
- * @param viewModel El ViewModel que gestiona el estado.
+ * Nota: El petId se obtiene automáticamente del SavedStateHandle en el ViewModel.
+ * No es necesario pasarlo como parámetro a la UI.
  */
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    petId: String,
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
-    val testLocations =
-        listOf(
-            Triple(-34.6706, -58.5664, "UNLaM"),
-            Triple(-34.6534, -58.6196, "Morón"),
-            Triple(-34.6486, -58.5917, "Haedo"),
-            Triple(-34.6646, -58.5974, "Carrefour (Thames y Cno. Cintura)"),
-        )
-
-    val selectedLocation = testLocations[3] // Cambiar el índice para probar diferentes lugares
-
     val context = LocalContext.current
-
-    // ===== CREAR MASCOTA TEMPORAL (HARDCODED) =====
-    // TODO: Cuando tengas el PetRepository, cargar la mascota real desde la BD
-    val pet =
-        remember(petId) {
-            Pet(
-                id = petId,
-                name = "Luna",
-                type = "Perro",
-                status = "Perdida",
-                gender = "Hembra",
-                seenAt = "2025-01-15",
-                locality = selectedLocation.third,
-                latitude = selectedLocation.first,
-                longitude = selectedLocation.second,
-                imageUrl = "",
-            )
-        }
 
     // ===== OBSERVAR ESTADO DEL VIEWMODEL =====
     val uiState by viewModel.uiState.collectAsState()
@@ -148,11 +118,6 @@ fun SearchScreen(
         wasPointingCorrectlyBefore = uiState.isPointingCorrectly
     }
 
-    // ===== INICIALIZAR BÚSQUEDA =====
-    LaunchedEffect(pet) {
-        viewModel.initSearch(pet)
-    }
-
     // ===== MANEJO DE PERMISOS CON ACCOMPANIST =====
     val locationPermissionState =
         rememberPermissionState(
@@ -178,12 +143,9 @@ fun SearchScreen(
     // ===== CONFIGURACIÓN DE LA CÁMARA =====
     val cameraPositionState =
         rememberCameraPositionState {
-            // Posición inicial: la ubicación de la mascota
-            position =
-                CameraPosition.fromLatLngZoom(
-                    LatLng(pet.latitude, pet.longitude),
-                    15f,
-                )
+            // Posición inicial: la ubicación de la mascota (o default si no hay)
+            val petLocation = uiState.pet?.let { LatLng(it.latitude, it.longitude) } ?: LatLng(0.0, 0.0)
+            position = CameraPosition.fromLatLngZoom(petLocation, 15f)
         }
 
     // ===== ANIMAR CÁMARA CUANDO LLEGA LA UBICACIÓN DEL USUARIO =====
@@ -281,17 +243,19 @@ fun SearchScreen(
                 ),
         ) {
             // ===== MARKER DE LA MASCOTA =====
-            val markerState =
-                rememberMarkerState(
-                    position = LatLng(pet.latitude, pet.longitude),
-                )
+            uiState.pet?.let { pet ->
+                val markerState =
+                    rememberMarkerState(
+                        position = LatLng(pet.latitude, pet.longitude),
+                    )
 
-            Marker(
-                state = markerState,
-                title = pet.name,
-                snippet = "Mascota perdida",
-                icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
-            )
+                Marker(
+                    state = markerState,
+                    title = pet.name,
+                    snippet = "Mascota perdida",
+                    icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
+                )
+            }
         }
 
         // ===== SEGMENTED BUTTON PARA CAMBIAR MODO =====

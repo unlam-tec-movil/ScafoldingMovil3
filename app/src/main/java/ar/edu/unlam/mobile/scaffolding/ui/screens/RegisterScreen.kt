@@ -33,7 +33,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import ar.edu.unlam.mobile.scaffolding.data.models.User
+import ar.edu.unlam.mobile.scaffolding.data.dto.User
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorOne
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorTwo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.DarkBlue

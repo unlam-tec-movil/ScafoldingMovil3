@@ -3,12 +3,14 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ar.edu.unlam.mobile.scaffolding.data.models.Gender
-import ar.edu.unlam.mobile.scaffolding.data.models.Pet
-import ar.edu.unlam.mobile.scaffolding.data.models.Status
-import ar.edu.unlam.mobile.scaffolding.data.models.TipoDePublicacion
-import ar.edu.unlam.mobile.scaffolding.data.models.Type
-import ar.edu.unlam.mobile.scaffolding.data.models.User
+import ar.edu.unlam.mobile.scaffolding.data.dto.Gender
+import ar.edu.unlam.mobile.scaffolding.data.dto.PetDto
+import ar.edu.unlam.mobile.scaffolding.data.dto.Status
+import ar.edu.unlam.mobile.scaffolding.data.dto.TipoDePublicacion
+import ar.edu.unlam.mobile.scaffolding.data.dto.Type
+import ar.edu.unlam.mobile.scaffolding.data.dto.User
+import ar.edu.unlam.mobile.scaffolding.data.mappers.toDomain
+import ar.edu.unlam.mobile.scaffolding.data.mappers.toDto
 import ar.edu.unlam.mobile.scaffolding.domain.repository.PetsRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import com.google.firebase.storage.FirebaseStorage
@@ -19,6 +21,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -37,8 +40,10 @@ class PostViewModel
         private val _currentUser = MutableStateFlow<User?>(null)
         val currentUser = _currentUser.asStateFlow()
 
-        private val _pets = MutableStateFlow<List<Pet>>(emptyList())
-        val pets: StateFlow<List<Pet>> = _pets
+        // NOTA: PostViewModel mantiene Pet de data.models (PetDto) para la UI (formularios)
+        // y usa mappers al interactuar con el repository (que trabaja con domain.model.Pet)
+        private val _pets = MutableStateFlow<List<PetDto>>(emptyList())
+        val pets: StateFlow<List<PetDto>> = _pets
 
         private val _statusFilter = MutableStateFlow(Status.LOST)
         private val _typeFilter = MutableStateFlow<Type?>(null)
@@ -57,7 +62,7 @@ class PostViewModel
             _postTipo.value = tipoPublicacion
         }
 
-        val filteredPets: StateFlow<List<Pet>> =
+        val filteredPets: StateFlow<List<PetDto>> =
             combine(
                 _pets,
                 _statusFilter,
@@ -86,9 +91,14 @@ class PostViewModel
 
         private fun loadAllPets() {
             viewModelScope.launch {
-                petsRepository.getAllPets().collect { list ->
-                    _pets.value = list
-                }
+                petsRepository
+                    .getAllPets()
+                    .map { domainPets ->
+                        // Convertir de domain.model.Pet → data.models.Pet (para la UI)
+                        domainPets.map { it.toDto() }
+                    }.collect { list ->
+                        _pets.value = list
+                    }
             }
         }
 
@@ -115,7 +125,7 @@ class PostViewModel
         }
 
         fun savePet(
-            pet: Pet,
+            pet: PetDto, // Recibe Pet de data.models (desde el formulario)
             imageUri: Uri?,
             onSuccessMessage: (String) -> Unit,
         ) {
@@ -134,7 +144,9 @@ class PostViewModel
                         finalPet = finalPet.copy(imageUrl = url)
                     }
 
-                    val petId = petsRepository.savePet(finalPet)
+                    // Convertir de data.models.Pet → domain.model.Pet antes de guardar
+                    val domainPet = finalPet.toDomain()
+                    val petId = petsRepository.savePet(domainPet)
 
                     userRepository.addPostToUser(user.id, petId)
 

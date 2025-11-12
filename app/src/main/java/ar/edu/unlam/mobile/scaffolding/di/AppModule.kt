@@ -1,6 +1,7 @@
 package ar.edu.unlam.mobile.scaffolding.di
 
 import android.content.Context
+import android.hardware.SensorManager
 import ar.edu.unlam.mobile.scaffolding.data.repository.PetsRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repository.UserRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.domain.repository.PetsRepository
@@ -44,4 +45,14 @@ object AppModule {
         auth: FirebaseAuth,
         db: FirebaseFirestore,
     ): UserRepository = UserRepositoryImpl(auth, db)
+
+    /**
+     * Provee el SensorManager de Android.
+     * Se usa para acceder a los sensores del dispositivo (magnetómetro, acelerómetro).
+     */
+    @Provides
+    @Singleton
+    fun provideSensorManager(
+        @ApplicationContext context: Context,
+    ): SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 }

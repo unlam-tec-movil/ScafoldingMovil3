@@ -1,10 +1,11 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens.search
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ar.edu.unlam.mobile.scaffolding.domain.model.Pet
 import ar.edu.unlam.mobile.scaffolding.domain.model.SearchMode
 import ar.edu.unlam.mobile.scaffolding.domain.repository.LocationRepository
+import ar.edu.unlam.mobile.scaffolding.domain.repository.PetsRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.SensorRepository
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.CalculateBearingUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -34,11 +35,17 @@ class SearchViewModel
         private val locationRepository: LocationRepository,
         private val sensorRepository: SensorRepository,
         private val calculateBearingUseCase: CalculateBearingUseCase,
+        private val petsRepository: PetsRepository,
+        savedStateHandle: SavedStateHandle,
     ) : ViewModel() {
         // ===== ESTADO DE LA UI =====
 
         private val _uiState = MutableStateFlow(SearchUiState())
         val uiState: StateFlow<SearchUiState> = _uiState
+
+        // ===== PET ID DESDE NAVEGACIÓN =====
+
+        private val petId: String = savedStateHandle.get<String>("petId") ?: ""
 
         // ===== JOBS DE COROUTINES =====
 
@@ -54,25 +61,19 @@ class SearchViewModel
          */
         private var locationJob: Job? = null
 
-        // ===== FUNCIONES PÚBLICAS (LLAMADAS DESDE LA UI) =====
+        // ===== INICIALIZACIÓN =====
 
-        /**
-         * Inicializa la búsqueda con una mascota específica.
-         *
-         * @param pet La mascota que se está buscando.
-         */
-        fun initSearch(pet: Pet) {
-            _uiState.update { it.copy(pet = pet) }
-
-            // Iniciar listener de ubicación continua
+        init {
+            loadPet()
             startListeningToLocation()
 
             // Si el estado inicial es RADAR, arrancar los sensores
-            // sin esperar a que el usuario presione el botón
             if (_uiState.value.searchMode == SearchMode.RADAR) {
                 startListeningToSensors()
             }
         }
+
+        // ===== FUNCIONES PÚBLICAS (LLAMADAS DESDE LA UI) =====
 
         /**
          * Actualiza el estado del permiso de ubicación.
@@ -112,6 +113,28 @@ class SearchViewModel
         }
 
         // ===== FUNCIONES PRIVADAS (LÓGICA INTERNA) =====
+
+        /**
+         * Carga la información de la mascota desde Firebase.
+         *
+         * Usa el petId obtenido de la navegación para cargar los datos reales
+         * de la mascota desde PetsRepository.
+         *
+         * El repositorio ya devuelve Pet del dominio, por lo que no necesita conversión.
+         */
+        private fun loadPet() {
+            petsRepository
+                .getPetById(petId)
+                .onEach { loadedPet ->
+                    // El repository ya devuelve Pet de domain
+                    _uiState.update { it.copy(pet = loadedPet) }
+                }.catch { exception ->
+                    // Manejar errores al cargar el Pet
+                    _uiState.update {
+                        it.copy(errorMessage = "Error cargando mascota: ${exception.message}")
+                    }
+                }.launchIn(viewModelScope)
+        }
 
         /**
          * Inicia el listener de ubicación continua.

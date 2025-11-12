@@ -28,8 +28,10 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.RegisterScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.feed.FeedScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapPostScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.map.MapScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.petdetail.PetDetailScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostFoundPet
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostMissingPetScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.search.SearchScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.editProfile.EditProfile
@@ -131,6 +133,24 @@ fun MainScreen() {
 
             composable("map") {
                 MapScreen()
+            }
+
+            // Ruta para detalles de mascota
+            composable(
+                "pet_detail/{petId}",
+                arguments = listOf(navArgument("petId") { type = NavType.StringType }),
+            ) { backStackEntry ->
+                val petId = backStackEntry.arguments?.getString("petId") ?: ""
+                PetDetailScreen(petId = petId, navController = controller)
+            }
+
+            // Ruta para búsqueda con Radar
+            // El petId se pasa en la ruta y el ViewModel lo obtiene del SavedStateHandle
+            composable(
+                "search/{petId}",
+                arguments = listOf(navArgument("petId") { type = NavType.StringType }),
+            ) {
+                SearchScreen()
             }
 
             composable("edit") {

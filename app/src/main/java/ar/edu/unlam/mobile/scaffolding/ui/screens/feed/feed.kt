@@ -68,11 +68,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import ar.edu.unlam.mobile.scaffolding.data.models.Gender
-import ar.edu.unlam.mobile.scaffolding.data.models.Pet
-import ar.edu.unlam.mobile.scaffolding.data.models.Status
-import ar.edu.unlam.mobile.scaffolding.data.models.TipoDePublicacion
-import ar.edu.unlam.mobile.scaffolding.data.models.Type
+import ar.edu.unlam.mobile.scaffolding.data.dto.Gender
+import ar.edu.unlam.mobile.scaffolding.data.dto.PetDto
+import ar.edu.unlam.mobile.scaffolding.data.dto.Status
+import ar.edu.unlam.mobile.scaffolding.data.dto.TipoDePublicacion
+import ar.edu.unlam.mobile.scaffolding.data.dto.Type
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostCard
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorOne
@@ -131,7 +131,12 @@ fun FeedScreen(
                 Spacer(modifier = Modifier.weight(1f))
                 FilterButton(onClick = { showSheet = true })
             }
-            PetFeed(pets = pets)
+            PetFeed(
+                pets = pets,
+                onPetClick = { petId ->
+                    navController.navigate("pet_detail/$petId")
+                },
+            )
         }
 
         PublishButton(
@@ -161,7 +166,10 @@ fun FeedScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PetFeed(pets: List<Pet>) {
+fun PetFeed(
+    pets: List<PetDto>,
+    onPetClick: (String) -> Unit,
+) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 160.dp),
         modifier =
@@ -172,7 +180,10 @@ fun PetFeed(pets: List<Pet>) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         items(pets) { pet ->
-            PostCard(pet = pet)
+            PostCard(
+                pet = pet,
+                onClick = { onPetClick(pet.id) },
+            )
         }
     }
 }
