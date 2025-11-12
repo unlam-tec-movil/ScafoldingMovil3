@@ -1,9 +1,14 @@
 package ar.edu.unlam.mobile.scaffolding.di
 
 import android.content.Context
-import android.hardware.SensorManager
+import ar.edu.unlam.mobile.scaffolding.data.repository.PetsRepositoryImpl
+import ar.edu.unlam.mobile.scaffolding.data.repository.UserRepositoryImpl
+import ar.edu.unlam.mobile.scaffolding.domain.repository.PetsRepository
+import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -14,29 +19,29 @@ import javax.inject.Singleton
 /**
  * Módulo de Hilt.
  * Le enseña a Hilt cómo crear instancias de servicios
- * que no podemos crear con @Inject porque son de librerías externas
- * o servicios del sistema Android.
+ * que no podemos crear con @Inject porque son de librerías externas.
  */
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
-    /**
-     * Provee el cliente de ubicación de Google Play Services.
-     * Se usa para obtener la ubicación GPS del usuario.
-     */
     @Provides
     @Singleton
-    fun provideFusedLocationProviderClient(
-        @ApplicationContext context: Context,
-    ): FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+    fun providePetsRepository(db: FirebaseFirestore): PetsRepository = PetsRepositoryImpl(db)
 
-    /**
-     * Provee el SensorManager de Android.
-     * Se usa para acceder a los sensores del dispositivo (magnetómetro, acelerómetro).
-     */
+    @Module
+    @InstallIn(SingletonComponent::class)
+    object LocationModule {
+        @Provides
+        @Singleton
+        fun provideFusedLocationProviderClient(
+            @ApplicationContext context: Context,
+        ): FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+    }
+
     @Provides
     @Singleton
-    fun provideSensorManager(
-        @ApplicationContext context: Context,
-    ): SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    fun provideUserRepository(
+        auth: FirebaseAuth,
+        db: FirebaseFirestore,
+    ): UserRepository = UserRepositoryImpl(auth, db)
 }

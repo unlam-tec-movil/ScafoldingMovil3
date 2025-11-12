@@ -10,24 +10,16 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
-class MapViewModel
+class MapPostViewModel
     @Inject
     constructor(
         private val locationRepository: LocationRepository,
         private val pinRepository: PinRepository,
     ) : ViewModel() {
-        private val _pets = MutableStateFlow<List<Pin>>(emptyList())
-        val pets: StateFlow<List<Pin>> = _pets
-
-        init {
-            viewModelScope.launch {
-                // _pets.value =
-                // TODO: Obtener todas las masacotas
-            }
-        }
         // ===== ESTADO DE UBICACIÓN =====
 
         /**
@@ -86,56 +78,6 @@ class MapViewModel
             }
         }
 
-        // ===== ESTADO DE PINS =====
-
-        /**
-         * Lista de pins guardados en el mapa.
-         * Trabaja con el modelo Pin del DOMINIO.
-         */
-        private val _pins = MutableStateFlow<List<Pin>>(emptyList())
-        val pins: StateFlow<List<Pin>> = _pins
-
-        /**
-         * Indica si se están cargando los pins.
-         */
-        private val _isLoadingPins = MutableStateFlow(false)
-        val isLoadingPins: StateFlow<Boolean> = _isLoadingPins
-
-        /**
-         * Carga todos los pins guardados desde el repositorio.
-         */
-        fun loadPins() {
-            viewModelScope.launch {
-                _isLoadingPins.value = true
-
-                val result = pinRepository.getAllPins()
-                result
-                    .onSuccess { pinList ->
-                        _pins.value = pinList
-                    }.onFailure {
-                        _pins.value = emptyList()
-                        // TODO: Emitir evento de error
-                    }
-
-                _isLoadingPins.value = false
-            }
-        }
-
-        init {
-            observePins()
-        }
-
-        private fun observePins() {
-            viewModelScope.launch {
-                _isLoadingPins.value = true
-
-                pinRepository.observePins().collect { pinList ->
-                    _pins.value = pinList
-                    _isLoadingPins.value = false
-                }
-            }
-        }
-
         /**
          * Guarda un nuevo pin.
          *
@@ -145,42 +87,42 @@ class MapViewModel
         fun savePin(
             latitude: Double,
             longitude: Double,
+            title: String,
+            description: String?,
         ) {
             viewModelScope.launch {
                 // El ViewModel crea el modelo del dominio con su lógica de negocio
                 val newPin =
                     Pin(
                         id =
-                            java.util.UUID
+                            UUID
                                 .randomUUID()
                                 .toString(),
                         // Lógica de generación de ID
                         latitude = latitude,
                         longitude = longitude,
-                        imageUrl = "https://cdn.pixabay.com/photo/2023/04/28/12/18/dogs-7956516_640.jpg",
+                        imageUrl = TODO(),
                     )
-                pinRepository
-                    .savePin(newPin)
-                    .onSuccess {
-                        // Recargar la lista de pins para reflejar el cambio
-                        loadPins()
-                    }.onFailure {
-                        // TODO: Emitir evento de error
-                    }
+                pinRepository.savePin(newPin)
+//                .onSuccess {
+                // Recargar la lista de pins para reflejar el cambio
+                // loadPins()
+//                }.onFailure {
+//                    // TODO: Emitir evento de error
+//                }
             }
         }
 
         /**
          * Elimina un pin por su ID.
          */
-
         fun deletePin(pinId: String) {
             viewModelScope.launch {
                 pinRepository
                     .deletePin(pinId)
                     .onSuccess {
                         // Recargar la lista de pins para reflejar el cambio
-                        loadPins()
+//                    loadPins()
                     }.onFailure {
                         // TODO: Emitir evento de error
                     }
