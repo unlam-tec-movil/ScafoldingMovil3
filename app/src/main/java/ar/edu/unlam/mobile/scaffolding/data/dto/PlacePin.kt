@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile.scaffolding.data.models
+package ar.edu.unlam.mobile.scaffolding.data.dto
 
 import kotlinx.serialization.Serializable
 
@@ -8,7 +8,7 @@ data class PlacePin(
         java.util.UUID
             .randomUUID()
             .toString(),
-    val lat: Double,
-    val lng: Double,
-    val imageURL: String,
+    val lat: Double = 0.0,
+    val lng: Double = 0.0,
+    val imageURL: String = "",
 )

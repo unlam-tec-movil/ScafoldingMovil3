@@ -1,6 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.domain.repository
 
-import ar.edu.unlam.mobile.scaffolding.data.models.User
+import ar.edu.unlam.mobile.scaffolding.data.dto.User
 
 interface UserRepository {
     suspend fun getCurrentUser(): User?

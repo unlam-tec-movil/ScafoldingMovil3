@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import ar.edu.unlam.mobile.scaffolding.data.models.TipoDePublicacion
+import ar.edu.unlam.mobile.scaffolding.data.dto.TipoDePublicacion
 import ar.edu.unlam.mobile.scaffolding.ui.components.AddPinDialog
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorTwo

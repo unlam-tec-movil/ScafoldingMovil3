@@ -1,6 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.data.repository
 
-import ar.edu.unlam.mobile.scaffolding.data.models.User
+import ar.edu.unlam.mobile.scaffolding.data.dto.User
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue

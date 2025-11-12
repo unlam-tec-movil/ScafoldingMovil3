@@ -3,8 +3,9 @@ package ar.edu.unlam.mobile.scaffolding.ui.screens.userPosts
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ar.edu.unlam.mobile.scaffolding.data.models.Pet
-import ar.edu.unlam.mobile.scaffolding.data.models.Status
+import ar.edu.unlam.mobile.scaffolding.data.dto.PetDto
+import ar.edu.unlam.mobile.scaffolding.data.dto.Status
+import ar.edu.unlam.mobile.scaffolding.data.mappers.toDto
 import ar.edu.unlam.mobile.scaffolding.domain.repository.PetsRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,16 +25,16 @@ class MyPetsViewModel
         private val petsRepository: PetsRepository,
         private val userRepository: UserRepository,
     ) : ViewModel() {
-        private val _posts = MutableStateFlow<List<Pet>>(emptyList())
+        private val _posts = MutableStateFlow<List<PetDto>>(emptyList())
         val posts = _posts.asStateFlow()
 
-        val lostPosts: StateFlow<List<Pet>> =
+        val lostPosts: StateFlow<List<PetDto>> =
             posts
                 .map { list ->
                     list.filter { it.status == Status.LOST }
                 }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-        val foundPosts: StateFlow<List<Pet>> =
+        val foundPosts: StateFlow<List<PetDto>> =
             posts
                 .map { list ->
                     list.filter { it.status == Status.FOUND }
@@ -45,9 +46,14 @@ class MyPetsViewModel
                 Log.d("MyPetsVM", "Usuario: $user")
 
                 if (user != null && user.posts.isNotEmpty()) {
-                    petsRepository.getPetsByIds(user.posts).collect { list ->
-                        _posts.value = list
-                    }
+                    petsRepository
+                        .getPetsByIds(user.posts)
+                        .map { domainPets ->
+                            // Convertir de domain a data para la UI
+                            domainPets.map { it.toDto() }
+                        }.collect { list ->
+                            _posts.value = list
+                        }
                 }
             }
         }

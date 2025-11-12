@@ -1,6 +1,7 @@
 package ar.edu.unlam.mobile.scaffolding.domain.repository
 
 import ar.edu.unlam.mobile.scaffolding.domain.model.UserLocation
+import kotlinx.coroutines.flow.Flow
 
 /**
  * Puerto de salida.
@@ -9,4 +10,10 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.UserLocation
  */
 interface LocationRepository {
     suspend fun getCurrentLocation(): Result<UserLocation>
+
+    /**
+     * Obtiene actualizaciones continuas de la ubicación del usuario.
+     * Emite una nueva ubicación cada vez que el usuario se mueve.
+     */
+    fun getLocationUpdates(): Flow<UserLocation>
 }

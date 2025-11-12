@@ -1,6 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding.data.mappers
 
-import ar.edu.unlam.mobile.scaffolding.data.models.PlacePin
+import ar.edu.unlam.mobile.scaffolding.data.dto.PlacePin
 import ar.edu.unlam.mobile.scaffolding.domain.model.Pin
 
 /**
