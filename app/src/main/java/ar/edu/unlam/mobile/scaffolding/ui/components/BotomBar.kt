@@ -50,40 +50,45 @@ fun BottomBar(
     val navBackStackEntry by controller.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    val gradientBrush = Brush.verticalGradient(
-        colors = listOf(
-            Color(0xFFF3AFC9), // rosa más fuerte (abajo)
-            Color(0xFFFCE3ED), // más claro (arriba)
-        ),
-    )
+    val gradientBrush =
+        Brush.verticalGradient(
+            colors =
+                listOf(
+                    Color(0xFFF3AFC9), // rosa más fuerte (abajo)
+                    Color(0xFFFCE3ED), // más claro (arriba)
+                ),
+        )
 
     val accent = Color(0xFFD81B60)
     val inactive = Color(0xFF8E8E8E)
 
     Surface(
-        modifier = modifier
-            .zIndex(1f)
-            .offset(y = (-8).dp)
-            .shadow(10.dp, RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp)),
+        modifier =
+            modifier
+                .zIndex(1f)
+                .offset(y = (-8).dp)
+                .shadow(10.dp, RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp)),
         color = Color.Transparent,
         shape = RoundedCornerShape(topStart = 26.dp, topEnd = 26.dp),
     ) {
         Box(
-            modifier = Modifier
-                .background(brush = gradientBrush)
-                .fillMaxWidth()
-                .height(72.dp),
+            modifier =
+                Modifier
+                    .background(brush = gradientBrush)
+                    .fillMaxWidth()
+                    .height(72.dp),
             contentAlignment = Alignment.Center,
         ) {
             NavigationBar(
                 containerColor = Color.Transparent,
                 tonalElevation = 0.dp,
             ) {
-                val items = listOf(
-                    BottomNavItem("feed", "feed", Icons.Default.Home, "Feed"),
-                    BottomNavItem(MAP_ROUTE, MAP_ROUTE, Icons.Default.Map, "Map"),
-                    BottomNavItem("user/{id}", "user/usuario", Icons.Default.Person, "User"),
-                )
+                val items =
+                    listOf(
+                        BottomNavItem("feed", "feed", Icons.Default.Home, "Feed"),
+                        BottomNavItem(MAP_ROUTE, MAP_ROUTE, Icons.Default.Map, "Map"),
+                        BottomNavItem("user/{id}", "user/usuario", Icons.Default.Person, "User"),
+                    )
 
                 items.forEach { item ->
                     val selected = currentRoute?.contains(item.matchRoute.substringBefore("/")) == true
@@ -100,12 +105,12 @@ fun BottomBar(
                         },
                         icon = {
                             Box(
-                                modifier = Modifier
-                                    .background(
-                                        color = backgroundColor,
-                                        shape = RoundedCornerShape(14.dp),
-                                    )
-                                    .padding(paddingAnim),
+                                modifier =
+                                    Modifier
+                                        .background(
+                                            color = backgroundColor,
+                                            shape = RoundedCornerShape(14.dp),
+                                        ).padding(paddingAnim),
                             ) {
                                 Icon(
                                     imageVector = item.icon,
@@ -114,11 +119,12 @@ fun BottomBar(
                                 )
                             }
                         },
-                        colors = NavigationBarItemDefaults.colors(
-                            indicatorColor = Color.Transparent,
-                            selectedIconColor = accent,
-                            unselectedIconColor = inactive,
-                        ),
+                        colors =
+                            NavigationBarItemDefaults.colors(
+                                indicatorColor = Color.Transparent,
+                                selectedIconColor = accent,
+                                unselectedIconColor = inactive,
+                            ),
                     )
                 }
             }
@@ -132,4 +138,3 @@ fun BottomBarPreview() {
     val controller = rememberNavController()
     BottomBar(controller = controller)
 }
-
