@@ -29,9 +29,8 @@ navigationCompose = "2.8.5"
 datastorePreferences = "1.1.1"
 coilCompose = "2.6.0"
 accompanistPermissions = "0.34.0"
-foundation = "1.9.4"
-foundationLayout = "1.9.4"
-androidbrowserhelper = "2.6.2"
+uiText = "1.9.4"
+
 
 
 [libraries]
@@ -83,9 +82,7 @@ coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose"
 
 # Accompanist
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
-androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
-androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
-androidbrowserhelper = { group = "com.google.androidbrowserhelper", name = "androidbrowserhelper", version.ref = "androidbrowserhelper" }
+androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
 
 
 [plugins]
