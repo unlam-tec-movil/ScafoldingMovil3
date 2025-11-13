@@ -22,20 +22,20 @@ import javax.inject.Inject
  * 5. Repository devuelve Flow<DeviceOrientation> al ViewModel
  */
 class SensorRepositoryImpl
-    @Inject
-    constructor(
-        private val sensorDataSource: SensorDataSource,
-    ) : SensorRepository {
-        /**
-         * Obtiene un stream continuo de la orientación del dispositivo.
-         *
-         * Convierte el Flow<Float> del DataSource en Flow<DeviceOrientation> del dominio.
-         */
-        override fun getDeviceOrientation(): Flow<DeviceOrientation> =
-            sensorDataSource
-                .getOrientation()
-                .map { azimuth ->
-                    // Convierte Float (capa de datos) → DeviceOrientation (capa de dominio)
-                    DeviceOrientation(azimuth = azimuth)
-                }
-    }
+@Inject
+constructor(
+    private val sensorDataSource: SensorDataSource,
+) : SensorRepository {
+    /**
+     * Obtiene un stream continuo de la orientación del dispositivo.
+     *
+     * Convierte el Flow<Float> del DataSource en Flow<DeviceOrientation> del dominio.
+     */
+    override fun getDeviceOrientation(): Flow<DeviceOrientation> =
+        sensorDataSource
+            .getOrientation()
+            .map { azimuth ->
+                // Convierte Float (capa de datos) → DeviceOrientation (capa de dominio)
+                DeviceOrientation(azimuth = azimuth)
+            }
+}

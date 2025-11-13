@@ -14,62 +14,62 @@ import javax.inject.Inject
  * Implementación del repositorio de Pins.
  */
 class PinRepositoryImpl
-    @Inject
-    constructor(
-        private val pinRemoteDataSource: PinRemoteDataSource,
-    ) : PinRepository {
-        /**
-         * Obtiene todos los pins guardados.
-         */
-        override suspend fun getAllPins(): Result<List<Pin>> =
-            try {
-                val placePins = pinRemoteDataSource.getAllPins()
-                val domainPins = placePins.map { it.toDomain() }
-                Result.success(domainPins)
-            } catch (e: Exception) {
-                Result.failure(e)
+@Inject
+constructor(
+    private val pinRemoteDataSource: PinRemoteDataSource,
+) : PinRepository {
+    /**
+     * Obtiene todos los pins guardados.
+     */
+    override suspend fun getAllPins(): Result<List<Pin>> =
+        try {
+            val placePins = pinRemoteDataSource.getAllPins()
+            val domainPins = placePins.map { it.toDomain() }
+            Result.success(domainPins)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+
+    /**
+     * Guarda un nuevo pin.
+     */
+    override suspend fun savePin(pin: Pin): Result<Unit> =
+        try {
+            val currentPins = pinRemoteDataSource.getAllPins().toMutableList()
+            val newPlacePin = pin.toData()
+            currentPins.add(newPlacePin)
+
+            val success = pinRemoteDataSource.savePins(currentPins)
+            if (success) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("No se pudo guardar el pin"))
             }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
-        /**
-         * Guarda un nuevo pin.
-         */
-        override suspend fun savePin(pin: Pin): Result<Unit> =
-            try {
-                val currentPins = pinRemoteDataSource.getAllPins().toMutableList()
-                val newPlacePin = pin.toData()
-                currentPins.add(newPlacePin)
+    /**
+     * Elimina un pin por su ID.
+     */
+    override suspend fun deletePin(pinId: String): Result<Unit> =
+        try {
+            val currentPins = pinRemoteDataSource.getAllPins()
+            val updatedPins = currentPins.filter { it.id != pinId }
 
-                val success = pinRemoteDataSource.savePins(currentPins)
-                if (success) {
-                    Result.success(Unit)
-                } else {
-                    Result.failure(Exception("No se pudo guardar el pin"))
-                }
-            } catch (e: Exception) {
-                Result.failure(e)
+            val success = pinRemoteDataSource.savePins(updatedPins)
+            if (success) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("No se pudo eliminar el pin"))
             }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
 
-        /**
-         * Elimina un pin por su ID.
-         */
-        override suspend fun deletePin(pinId: String): Result<Unit> =
-            try {
-                val currentPins = pinRemoteDataSource.getAllPins()
-                val updatedPins = currentPins.filter { it.id != pinId }
-
-                val success = pinRemoteDataSource.savePins(updatedPins)
-                if (success) {
-                    Result.success(Unit)
-                } else {
-                    Result.failure(Exception("No se pudo eliminar el pin"))
-                }
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-
-        // Devuelve la lista de pines en tiempo real
-        override fun observePins(): Flow<List<Pin>> =
-            pinRemoteDataSource.observePins().map { placePinList: List<PlacePin> ->
-                placePinList.map { it.toDomain() }
-            }
-    }
+    // Devuelve la lista de pines en tiempo real
+    override fun observePins(): Flow<List<Pin>> =
+        pinRemoteDataSource.observePins().map { placePinList: List<PlacePin> ->
+            placePinList.map { it.toDomain() }
+        }
+}

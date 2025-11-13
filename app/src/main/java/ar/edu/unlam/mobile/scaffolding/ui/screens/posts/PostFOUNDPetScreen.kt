@@ -102,7 +102,9 @@ fun PostFoundPet(
                                 }
                             }
                         } else {
-                            Toast.makeText(context, "Faltan completar campos", Toast.LENGTH_SHORT).show()
+                            Toast
+                                .makeText(context, "Faltan completar campos", Toast.LENGTH_SHORT)
+                                .show()
                         }
                     },
                 )

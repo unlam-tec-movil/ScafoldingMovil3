@@ -20,41 +20,41 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class MyPetsViewModel
-    @Inject
-    constructor(
-        private val petsRepository: PetsRepository,
-        private val userRepository: UserRepository,
-    ) : ViewModel() {
-        private val _posts = MutableStateFlow<List<PetDto>>(emptyList())
-        val posts = _posts.asStateFlow()
+@Inject
+constructor(
+    private val petsRepository: PetsRepository,
+    private val userRepository: UserRepository,
+) : ViewModel() {
+    private val _posts = MutableStateFlow<List<PetDto>>(emptyList())
+    val posts = _posts.asStateFlow()
 
-        val lostPosts: StateFlow<List<PetDto>> =
-            posts
-                .map { list ->
-                    list.filter { it.status == Status.LOST }
-                }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    val lostPosts: StateFlow<List<PetDto>> =
+        posts
+            .map { list ->
+                list.filter { it.status == Status.LOST }
+            }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-        val foundPosts: StateFlow<List<PetDto>> =
-            posts
-                .map { list ->
-                    list.filter { it.status == Status.FOUND }
-                }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    val foundPosts: StateFlow<List<PetDto>> =
+        posts
+            .map { list ->
+                list.filter { it.status == Status.FOUND }
+            }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 
-        init {
-            viewModelScope.launch {
-                val user = userRepository.getCurrentUser()
-                Log.d("MyPetsVM", "Usuario: $user")
+    init {
+        viewModelScope.launch {
+            val user = userRepository.getCurrentUser()
+            Log.d("MyPetsVM", "Usuario: $user")
 
-                if (user != null && user.posts.isNotEmpty()) {
-                    petsRepository
-                        .getPetsByIds(user.posts)
-                        .map { domainPets ->
-                            // Convertir de domain a data para la UI
-                            domainPets.map { it.toDto() }
-                        }.collect { list ->
-                            _posts.value = list
-                        }
-                }
+            if (user != null && user.posts.isNotEmpty()) {
+                petsRepository
+                    .getPetsByIds(user.posts)
+                    .map { domainPets ->
+                        // Convertir de domain a data para la UI
+                        domainPets.map { it.toDto() }
+                    }.collect { list ->
+                        _posts.value = list
+                    }
             }
         }
     }
+}

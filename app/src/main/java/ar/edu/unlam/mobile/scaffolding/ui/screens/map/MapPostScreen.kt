@@ -247,7 +247,9 @@ fun MapPostScreen(
                     TipoDePublicacion.MASCOTAENCONTRADA -> navController.navigate("post_found_pet_screen")
 
                     else -> {
-                        Toast.makeText(context, "Error: postMode es null", Toast.LENGTH_SHORT).show()
+                        Toast
+                            .makeText(context, "Error: postMode es null", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
             },
@@ -265,7 +267,8 @@ fun CirculoDecorativoMapa(modifier: Modifier = Modifier) {
                 .height(500.dp)
                 .graphicsLayer {
                     scaleX = 1.5f
-                }.background(
+                }
+                .background(
                     color = ColorTwo,
                     shape = RoundedCornerShape(180.dp),
                 ),

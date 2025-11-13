@@ -1,6 +1,12 @@
 package ar.edu.unlam.mobile.scaffolding.ui.components
 
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -35,7 +41,15 @@ fun FloatingParticlesBackgroundAnimated(
                 Particle(
                     id = i,
                     radius = random.nextInt(10, 22).toFloat(), // 🔹 tamaño más visible
-                    color = Color(0xFFD81B60).copy(alpha = listOf(0.12f, 0.18f, 0.25f).random(random)),
+                    color =
+                        Color(0xFFD81B60).copy(
+                            alpha =
+                                listOf(
+                                    0.12f,
+                                    0.18f,
+                                    0.25f,
+                                ).random(random),
+                        ),
                     baseX = random.nextFloat(),
                     baseY = random.nextFloat(),
                     speedX = random.nextInt(4000, 8000),

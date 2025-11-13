@@ -20,63 +20,66 @@ import javax.inject.Inject
  * Obtiene la última ubicación conocida del usuario.
  */
 class LocationDataSource
-    @Inject
-    constructor(
-        private val fusedLocationClient: FusedLocationProviderClient,
-    ) {
-        @SuppressLint("MissingPermission")
-        suspend fun getCurrentLocation(): Location? =
-            try {
-                // Crea un token de cancelación para la petición
-                val cancellationTokenSource = CancellationTokenSource()
+@Inject
+constructor(
+    private val fusedLocationClient: FusedLocationProviderClient,
+) {
+    @SuppressLint("MissingPermission")
+    suspend fun getCurrentLocation(): Location? =
+        try {
+            // Crea un token de cancelación para la petición
+            val cancellationTokenSource = CancellationTokenSource()
 
-                // Solicita ubicación
-                fusedLocationClient
-                    .getCurrentLocation(
+            // Solicita ubicación
+            fusedLocationClient
+                .getCurrentLocation(
+                    Priority.PRIORITY_HIGH_ACCURACY,
+                    cancellationTokenSource.token,
+                ).await()
+        } catch (e: Exception) {
+            // Si algo falla retorna null
+            null
+        }
+
+    /**
+     * Obtiene actualizaciones continuas de ubicación.
+     * Usa callbackFlow para convertir los callbacks de Google en un Flow reactivo.
+     */
+    @SuppressLint("MissingPermission")
+    fun getLocationUpdates(): Flow<Location> =
+        callbackFlow {
+            // Configurar petición de ubicación
+            val locationRequest =
+                LocationRequest
+                    .Builder(
                         Priority.PRIORITY_HIGH_ACCURACY,
-                        cancellationTokenSource.token,
-                    ).await()
-            } catch (e: Exception) {
-                // Si algo falla retorna null
-                null
-            }
+                        5000L,
+                    ) // Actualización cada 5 segundos
+                    .setMinUpdateIntervalMillis(2000L) // Mínimo 2 segundos entre actualizaciones
+                    .setWaitForAccurateLocation(false)
+                    .build()
 
-        /**
-         * Obtiene actualizaciones continuas de ubicación.
-         * Usa callbackFlow para convertir los callbacks de Google en un Flow reactivo.
-         */
-        @SuppressLint("MissingPermission")
-        fun getLocationUpdates(): Flow<Location> =
-            callbackFlow {
-                // Configurar petición de ubicación
-                val locationRequest =
-                    LocationRequest
-                        .Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L) // Actualización cada 5 segundos
-                        .setMinUpdateIntervalMillis(2000L) // Mínimo 2 segundos entre actualizaciones
-                        .setWaitForAccurateLocation(false)
-                        .build()
-
-                // Callback que escucha nuevas ubicaciones
-                val locationCallback =
-                    object : LocationCallback() {
-                        override fun onLocationResult(result: LocationResult) {
-                            // Por cada ubicación recibida, emitirla al Flow
-                            result.lastLocation?.let { location ->
-                                trySend(location)
-                            }
+            // Callback que escucha nuevas ubicaciones
+            val locationCallback =
+                object : LocationCallback() {
+                    override fun onLocationResult(result: LocationResult) {
+                        // Por cada ubicación recibida, emitirla al Flow
+                        result.lastLocation?.let { location ->
+                            trySend(location)
                         }
                     }
-
-                // Registrar el listener de ubicaciones
-                fusedLocationClient.requestLocationUpdates(
-                    locationRequest,
-                    locationCallback,
-                    Looper.getMainLooper(),
-                )
-
-                // Cuando el Flow se cancela, remover el listener
-                awaitClose {
-                    fusedLocationClient.removeLocationUpdates(locationCallback)
                 }
+
+            // Registrar el listener de ubicaciones
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper(),
+            )
+
+            // Cuando el Flow se cancela, remover el listener
+            awaitClose {
+                fusedLocationClient.removeLocationUpdates(locationCallback)
             }
-    }
+        }
+}

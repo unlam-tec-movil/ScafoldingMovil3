@@ -1,4 +1,5 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens
+
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateDpAsState
@@ -411,7 +412,11 @@ fun Hands(
         Image(
             painter = painterResource(id = R.drawable.dog_login_hand),
             contentDescription = "Left hand",
-            modifier = Modifier.size(80.dp).offset(y = offsetY).graphicsLayer(rotationZ = rotationLeftHand),
+            modifier =
+                Modifier
+                    .size(80.dp)
+                    .offset(y = offsetY)
+                    .graphicsLayer(rotationZ = rotationLeftHand),
         )
         Spacer(modifier = Modifier.width(70.dp))
 

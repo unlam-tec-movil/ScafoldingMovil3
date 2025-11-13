@@ -141,7 +141,13 @@ fun MainScreen() {
                 arguments = listOf(navArgument("petId") { type = NavType.StringType }),
             ) { backStackEntry ->
                 val petId = backStackEntry.arguments?.getString("petId") ?: ""
-                PetDetailScreen(petId = petId, navController = controller)
+                PetDetailScreen(
+                    petId = petId,
+                    navController = controller,
+                    onNavigateBack = { controller.popBackStack() },
+                    onEdit = { /* Implementar lógica de edición */ },
+                    onDelete = { /* Implementar lógica de eliminación */ },
+                )
             }
 
             // Ruta para búsqueda con Radar

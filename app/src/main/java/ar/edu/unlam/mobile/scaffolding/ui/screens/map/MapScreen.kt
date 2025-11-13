@@ -117,6 +117,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
             ShowPermissionDenied(isFirstLoad, status, context, locationPermissionState)
             return
         }
+
         is PermissionStatus.Granted -> {
             // Permiso concedido, continuar con el mapa (código abajo)
         }

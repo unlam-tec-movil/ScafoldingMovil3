@@ -22,44 +22,44 @@ import javax.inject.Inject
  * 5. Repository devuelve Result<UserLocation> al ViewModel
  */
 class LocationRepositoryImpl
-    @Inject
-    constructor(
-        private val locationDataSource: LocationDataSource,
-    ) : LocationRepository {
-        /**
-         * Obtiene la ubicación actual del usuario.
-         * Maneja Result.success en caso de éxito, o Result.failure en caso de error.
-         */
-        override suspend fun getCurrentLocation(): Result<UserLocation> =
-            try {
-                // 1. Obtiene Location de Google vía DataSource
-                val location = locationDataSource.getCurrentLocation()
+@Inject
+constructor(
+    private val locationDataSource: LocationDataSource,
+) : LocationRepository {
+    /**
+     * Obtiene la ubicación actual del usuario.
+     * Maneja Result.success en caso de éxito, o Result.failure en caso de error.
+     */
+    override suspend fun getCurrentLocation(): Result<UserLocation> =
+        try {
+            // 1. Obtiene Location de Google vía DataSource
+            val location = locationDataSource.getCurrentLocation()
 
-                // 2. Verifica que no sea null
-                if (location != null) {
-                    // 3. Convierte Location -> UserLocation usando el mapper
-                    val userLocation = location.toDomain()
+            // 2. Verifica que no sea null
+            if (location != null) {
+                // 3. Convierte Location -> UserLocation usando el mapper
+                val userLocation = location.toDomain()
 
-                    // 4. Retorna éxito
-                    Result.success(userLocation)
-                } else {
-                    // Si location es null
-                    Result.failure(Exception("No se pudo obtener la ubicación"))
-                }
-            } catch (e: SecurityException) {
-                // Si no hay permisos
-                Result.failure(Exception("Permisos de ubicación no concedidos"))
-            } catch (e: Exception) {
-                // Cualquier otro error
-                Result.failure(e)
+                // 4. Retorna éxito
+                Result.success(userLocation)
+            } else {
+                // Si location es null
+                Result.failure(Exception("No se pudo obtener la ubicación"))
             }
+        } catch (e: SecurityException) {
+            // Si no hay permisos
+            Result.failure(Exception("Permisos de ubicación no concedidos"))
+        } catch (e: Exception) {
+            // Cualquier otro error
+            Result.failure(e)
+        }
 
-        /**
-         * Obtiene actualizaciones continuas de ubicación.
-         * Mapea cada Location que emite el DataSource a UserLocation del dominio.
-         */
-        override fun getLocationUpdates(): Flow<UserLocation> =
-            locationDataSource
-                .getLocationUpdates()
-                .map { location -> location.toDomain() }
-    }
+    /**
+     * Obtiene actualizaciones continuas de ubicación.
+     * Mapea cada Location que emite el DataSource a UserLocation del dominio.
+     */
+    override fun getLocationUpdates(): Flow<UserLocation> =
+        locationDataSource
+            .getLocationUpdates()
+            .map { location -> location.toDomain() }
+}

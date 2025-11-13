@@ -144,7 +144,8 @@ fun SearchScreen(
     val cameraPositionState =
         rememberCameraPositionState {
             // Posición inicial: la ubicación de la mascota (o default si no hay)
-            val petLocation = uiState.pet?.let { LatLng(it.latitude, it.longitude) } ?: LatLng(0.0, 0.0)
+            val petLocation =
+                uiState.pet?.let { LatLng(it.latitude, it.longitude) } ?: LatLng(0.0, 0.0)
             position = CameraPosition.fromLatLngZoom(petLocation, 15f)
         }
 
@@ -217,6 +218,7 @@ fun SearchScreen(
             }
             return
         }
+
         is PermissionStatus.Granted -> {
             // Permiso concedido, continuar con el mapa
         }
@@ -271,7 +273,8 @@ fun SearchScreen(
                         .background(
                             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
                             shape = RoundedCornerShape(50),
-                        ).padding(4.dp),
+                        )
+                        .padding(4.dp),
             ) {
                 SegmentedButton(
                     selected = uiState.searchMode == SearchMode.ROUTE,
@@ -337,7 +340,8 @@ fun SearchScreen(
                         .background(
                             color = MaterialTheme.colorScheme.errorContainer,
                             shape = RoundedCornerShape(8.dp),
-                        ).padding(12.dp),
+                        )
+                        .padding(12.dp),
             )
         }
     }

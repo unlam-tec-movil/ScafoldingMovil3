@@ -9,48 +9,48 @@ import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
 class UserRepositoryImpl
-    @Inject
-    constructor(
-        private val auth: FirebaseAuth,
-        private val db: FirebaseFirestore,
-    ) : UserRepository {
-        override suspend fun getCurrentUser(): User? {
-            val uid = auth.currentUser?.uid ?: return null
-            return getUser(uid)
-        }
-
-        override suspend fun getUser(uid: String): User? =
-            db
-                .collection("Users")
-                .document(uid)
-                .get()
-                .await()
-                .toObject(User::class.java)
-
-        override suspend fun saveUser(user: User) {
-            db
-                .collection("Users")
-                .document(user.id)
-                .set(user)
-                .await()
-        }
-
-        override suspend fun createUser(user: User) {
-            db
-                .collection("Users")
-                .document(user.id)
-                .set(user)
-                .await()
-        }
-
-        override suspend fun addPostToUser(
-            userId: String,
-            postId: String,
-        ) {
-            db
-                .collection("Users")
-                .document(userId)
-                .update("posts", FieldValue.arrayUnion(postId))
-                .await()
-        }
+@Inject
+constructor(
+    private val auth: FirebaseAuth,
+    private val db: FirebaseFirestore,
+) : UserRepository {
+    override suspend fun getCurrentUser(): User? {
+        val uid = auth.currentUser?.uid ?: return null
+        return getUser(uid)
     }
+
+    override suspend fun getUser(uid: String): User? =
+        db
+            .collection("Users")
+            .document(uid)
+            .get()
+            .await()
+            .toObject(User::class.java)
+
+    override suspend fun saveUser(user: User) {
+        db
+            .collection("Users")
+            .document(user.id)
+            .set(user)
+            .await()
+    }
+
+    override suspend fun createUser(user: User) {
+        db
+            .collection("Users")
+            .document(user.id)
+            .set(user)
+            .await()
+    }
+
+    override suspend fun addPostToUser(
+        userId: String,
+        postId: String,
+    ) {
+        db
+            .collection("Users")
+            .document(userId)
+            .update("posts", FieldValue.arrayUnion(postId))
+            .await()
+    }
+}

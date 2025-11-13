@@ -91,7 +91,8 @@ fun BottomBar(
                     )
 
                 items.forEach { item ->
-                    val selected = currentRoute?.contains(item.matchRoute.substringBefore("/")) == true
+                    val selected =
+                        currentRoute?.contains(item.matchRoute.substringBefore("/")) == true
                     val iconColor by animateColorAsState(if (selected) Color.White else inactive)
                     val backgroundColor by animateColorAsState(if (selected) accent else Color.Transparent)
                     val paddingAnim by animateDpAsState(if (selected) 6.dp else 10.dp)
@@ -110,7 +111,8 @@ fun BottomBar(
                                         .background(
                                             color = backgroundColor,
                                             shape = RoundedCornerShape(14.dp),
-                                        ).padding(paddingAnim),
+                                        )
+                                        .padding(paddingAnim),
                             ) {
                                 Icon(
                                     imageVector = item.icon,
