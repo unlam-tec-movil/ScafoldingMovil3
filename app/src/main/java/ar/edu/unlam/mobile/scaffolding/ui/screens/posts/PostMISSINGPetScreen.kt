@@ -147,7 +147,10 @@ fun PostMissingPetScreen(
             ) {
                 Text(
                     text = "Completa los datos de tu mascota.",
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    style =
+                        MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
                     color = Color.White,
                     modifier = Modifier.padding(bottom = 16.dp),
                 )
@@ -210,7 +213,10 @@ fun PostMissingPetTopBar(
             ) {
                 Text(
                     text = "Finalizar",
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    style =
+                        MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
                     color = Color.White,
                 )
             }
@@ -303,8 +309,7 @@ fun PetPhotoUploader(
                                                 }
                                         permissionLauncher.launch(Manifest.permission.CAMERA)
                                     }
-                                }
-                                .padding(12.dp),
+                                }.padding(12.dp),
                     )
 
                     Text(
@@ -315,8 +320,7 @@ fun PetPhotoUploader(
                                 .clickable {
                                     showPicker = false
                                     galleryLauncher.launch("image/*")
-                                }
-                                .padding(12.dp),
+                                }.padding(12.dp),
                     )
                 }
             },
@@ -481,8 +485,7 @@ fun CirculoDecorativo(modifier: Modifier = Modifier) {
                 .height(280.dp)
                 .graphicsLayer {
                     scaleX = 1.5f
-                }
-                .background(
+                }.background(
                     color = ColorTwo,
                     shape = RoundedCornerShape(180.dp),
                 ),

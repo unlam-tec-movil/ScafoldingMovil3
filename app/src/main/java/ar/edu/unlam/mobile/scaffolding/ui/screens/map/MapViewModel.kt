@@ -14,176 +14,176 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MapViewModel
-@Inject
-constructor(
-    private val locationRepository: LocationRepository,
-    private val pinRepository: PinRepository,
-) : ViewModel() {
-    private val _pets = MutableStateFlow<List<Pin>>(emptyList())
-    val pets: StateFlow<List<Pin>> = _pets
+    @Inject
+    constructor(
+        private val locationRepository: LocationRepository,
+        private val pinRepository: PinRepository,
+    ) : ViewModel() {
+        private val _pets = MutableStateFlow<List<Pin>>(emptyList())
+        val pets: StateFlow<List<Pin>> = _pets
 
-    init {
-        viewModelScope.launch {
-            // _pets.value =
-            // TODO: Obtener todas las masacotas
+        init {
+            viewModelScope.launch {
+                // _pets.value =
+                // TODO: Obtener todas las masacotas
+            }
         }
-    }
-    // ===== ESTADO DE UBICACIÓN =====
+        // ===== ESTADO DE UBICACIÓN =====
 
-    /**
-     * Ubicación actual del usuario.
-     * null: aún no se cargó o falló.
-     * UserLocation: Coordenadas obtenidas con éxito.
-     */
-    private val _currentLocation = MutableStateFlow<UserLocation?>(null)
-    val currentLocation: StateFlow<UserLocation?> = _currentLocation
+        /**
+         * Ubicación actual del usuario.
+         * null: aún no se cargó o falló.
+         * UserLocation: Coordenadas obtenidas con éxito.
+         */
+        private val _currentLocation = MutableStateFlow<UserLocation?>(null)
+        val currentLocation: StateFlow<UserLocation?> = _currentLocation
 
-    // ===== ESTADO DE PERMISOS =====
+        // ===== ESTADO DE PERMISOS =====
 
-    /**
-     * Estado del permiso de ubicación.
-     * true: usuario concedió el permiso / false: usuario no concedió el permiso.
-     */
-    private val _hasLocationPermission = MutableStateFlow(false)
-    val hasLocationPermission: StateFlow<Boolean> = _hasLocationPermission
+        /**
+         * Estado del permiso de ubicación.
+         * true: usuario concedió el permiso / false: usuario no concedió el permiso.
+         */
+        private val _hasLocationPermission = MutableStateFlow(false)
+        val hasLocationPermission: StateFlow<Boolean> = _hasLocationPermission
 
-    // ===== ESTADO DE LOADING =====
+        // ===== ESTADO DE LOADING =====
 
-    /**
-     * Indica si se está cargando la ubicación.
-     * true: petición en curso / false: 'Idle' puede ser éxito o error
-     */
-    private val _isLoadingLocation = MutableStateFlow(false)
-    val isLoadingLocation: StateFlow<Boolean> = _isLoadingLocation
+        /**
+         * Indica si se está cargando la ubicación.
+         * true: petición en curso / false: 'Idle' puede ser éxito o error
+         */
+        private val _isLoadingLocation = MutableStateFlow(false)
+        val isLoadingLocation: StateFlow<Boolean> = _isLoadingLocation
 
-    // Actualiza el estado del permiso de ubicación.
-    fun onLocationPermissionChanged(granted: Boolean) {
-        _hasLocationPermission.value = granted
-    }
-
-    // Carga la ubicación actual del usuario.
-    fun loadCurrentLocation() {
-        viewModelScope.launch {
-            // 1. Indica que está cargando
-            _isLoadingLocation.value = true
-
-            // 2. Llama al repositorio (capa de dominio)
-            val result = locationRepository.getCurrentLocation()
-
-            // 3. Maneja el resultado
-            result
-                .onSuccess { userLocation ->
-                    _currentLocation.value = userLocation
-                }.onFailure { exception ->
-                    _currentLocation.value = null
-
-                    // TODO: Emitir evento para mostrar Snackbar con mensaje de error
-                    // Por ejemplo: "No se pudo obtener la ubicación."
-                }
-
-            // 4. Indica que terminó la carga
-            _isLoadingLocation.value = false
+        // Actualiza el estado del permiso de ubicación.
+        fun onLocationPermissionChanged(granted: Boolean) {
+            _hasLocationPermission.value = granted
         }
-    }
 
-    // ===== ESTADO DE PINS =====
+        // Carga la ubicación actual del usuario.
+        fun loadCurrentLocation() {
+            viewModelScope.launch {
+                // 1. Indica que está cargando
+                _isLoadingLocation.value = true
 
-    /**
-     * Lista de pins guardados en el mapa.
-     * Trabaja con el modelo Pin del DOMINIO.
-     */
-    private val _pins = MutableStateFlow<List<Pin>>(emptyList())
-    val pins: StateFlow<List<Pin>> = _pins
+                // 2. Llama al repositorio (capa de dominio)
+                val result = locationRepository.getCurrentLocation()
 
-    /**
-     * Indica si se están cargando los pins.
-     */
-    private val _isLoadingPins = MutableStateFlow(false)
-    val isLoadingPins: StateFlow<Boolean> = _isLoadingPins
+                // 3. Maneja el resultado
+                result
+                    .onSuccess { userLocation ->
+                        _currentLocation.value = userLocation
+                    }.onFailure { exception ->
+                        _currentLocation.value = null
 
-    /**
-     * Carga todos los pins guardados desde el repositorio.
-     */
-    fun loadPins() {
-        viewModelScope.launch {
-            _isLoadingPins.value = true
+                        // TODO: Emitir evento para mostrar Snackbar con mensaje de error
+                        // Por ejemplo: "No se pudo obtener la ubicación."
+                    }
 
-            val result = pinRepository.getAllPins()
-            result
-                .onSuccess { pinList ->
-                    _pins.value = pinList
-                }.onFailure {
-                    _pins.value = emptyList()
-                    // TODO: Emitir evento de error
-                }
-
-            _isLoadingPins.value = false
+                // 4. Indica que terminó la carga
+                _isLoadingLocation.value = false
+            }
         }
-    }
 
-    init {
-        observePins()
-    }
+        // ===== ESTADO DE PINS =====
 
-    private fun observePins() {
-        viewModelScope.launch {
-            _isLoadingPins.value = true
+        /**
+         * Lista de pins guardados en el mapa.
+         * Trabaja con el modelo Pin del DOMINIO.
+         */
+        private val _pins = MutableStateFlow<List<Pin>>(emptyList())
+        val pins: StateFlow<List<Pin>> = _pins
 
-            pinRepository.observePins().collect { pinList ->
-                _pins.value = pinList
+        /**
+         * Indica si se están cargando los pins.
+         */
+        private val _isLoadingPins = MutableStateFlow(false)
+        val isLoadingPins: StateFlow<Boolean> = _isLoadingPins
+
+        /**
+         * Carga todos los pins guardados desde el repositorio.
+         */
+        fun loadPins() {
+            viewModelScope.launch {
+                _isLoadingPins.value = true
+
+                val result = pinRepository.getAllPins()
+                result
+                    .onSuccess { pinList ->
+                        _pins.value = pinList
+                    }.onFailure {
+                        _pins.value = emptyList()
+                        // TODO: Emitir evento de error
+                    }
+
                 _isLoadingPins.value = false
             }
         }
-    }
 
-    /**
-     * Guarda un nuevo pin.
-     *
-     * La UI solo pasa los datos primitivos. El ViewModel es responsable
-     * de crear el modelo Pin del dominio (incluyendo generar el ID).
-     */
-    fun savePin(
-        latitude: Double,
-        longitude: Double,
-    ) {
-        viewModelScope.launch {
-            // El ViewModel crea el modelo del dominio con su lógica de negocio
-            val newPin =
-                Pin(
-                    id =
-                        java.util.UUID
-                            .randomUUID()
-                            .toString(),
-                    // Lógica de generación de ID
-                    latitude = latitude,
-                    longitude = longitude,
-                    imageUrl = "https://cdn.pixabay.com/photo/2023/04/28/12/18/dogs-7956516_640.jpg",
-                )
-            pinRepository
-                .savePin(newPin)
-                .onSuccess {
-                    // Recargar la lista de pins para reflejar el cambio
-                    loadPins()
-                }.onFailure {
-                    // TODO: Emitir evento de error
+        init {
+            observePins()
+        }
+
+        private fun observePins() {
+            viewModelScope.launch {
+                _isLoadingPins.value = true
+
+                pinRepository.observePins().collect { pinList ->
+                    _pins.value = pinList
+                    _isLoadingPins.value = false
                 }
+            }
+        }
+
+        /**
+         * Guarda un nuevo pin.
+         *
+         * La UI solo pasa los datos primitivos. El ViewModel es responsable
+         * de crear el modelo Pin del dominio (incluyendo generar el ID).
+         */
+        fun savePin(
+            latitude: Double,
+            longitude: Double,
+        ) {
+            viewModelScope.launch {
+                // El ViewModel crea el modelo del dominio con su lógica de negocio
+                val newPin =
+                    Pin(
+                        id =
+                            java.util.UUID
+                                .randomUUID()
+                                .toString(),
+                        // Lógica de generación de ID
+                        latitude = latitude,
+                        longitude = longitude,
+                        imageUrl = "https://cdn.pixabay.com/photo/2023/04/28/12/18/dogs-7956516_640.jpg",
+                    )
+                pinRepository
+                    .savePin(newPin)
+                    .onSuccess {
+                        // Recargar la lista de pins para reflejar el cambio
+                        loadPins()
+                    }.onFailure {
+                        // TODO: Emitir evento de error
+                    }
+            }
+        }
+
+        /**
+         * Elimina un pin por su ID.
+         */
+
+        fun deletePin(pinId: String) {
+            viewModelScope.launch {
+                pinRepository
+                    .deletePin(pinId)
+                    .onSuccess {
+                        // Recargar la lista de pins para reflejar el cambio
+                        loadPins()
+                    }.onFailure {
+                        // TODO: Emitir evento de error
+                    }
+            }
         }
     }
-
-    /**
-     * Elimina un pin por su ID.
-     */
-
-    fun deletePin(pinId: String) {
-        viewModelScope.launch {
-            pinRepository
-                .deletePin(pinId)
-                .onSuccess {
-                    // Recargar la lista de pins para reflejar el cambio
-                    loadPins()
-                }.onFailure {
-                    // TODO: Emitir evento de error
-                }
-        }
-    }
-}

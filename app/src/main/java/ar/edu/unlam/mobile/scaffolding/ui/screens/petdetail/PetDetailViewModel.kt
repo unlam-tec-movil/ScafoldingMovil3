@@ -13,18 +13,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PetDetailViewModel
-@Inject
-constructor(
-    private val repository: PetsRepository,
-) : ViewModel() {
-    private val _pet = MutableStateFlow<Pet?>(null)
-    val pet = _pet.asStateFlow()
+    @Inject
+    constructor(
+        private val repository: PetsRepository,
+    ) : ViewModel() {
+        private val _pet = MutableStateFlow<Pet?>(null)
+        val pet = _pet.asStateFlow()
 
-    fun loadPet(petId: String) {
-        viewModelScope.launch {
-            repository.getPetById(petId).collectLatest { pet ->
-                _pet.value = pet
+        fun loadPet(petId: String) {
+            viewModelScope.launch {
+                repository.getPetById(petId).collectLatest { pet ->
+                    _pet.value = pet
+                }
             }
         }
     }
-}

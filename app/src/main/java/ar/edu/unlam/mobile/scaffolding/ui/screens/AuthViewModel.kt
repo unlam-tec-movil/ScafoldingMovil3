@@ -16,75 +16,75 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel
-@Inject
-constructor(
-    private val auth: FirebaseAuth,
-    private val userRepository: UserRepository,
-) : ViewModel() {
-    fun registerUser(
-        email: String,
-        password: String,
-        user: User,
-        onSuccessMessage: (String) -> Unit,
-        onErrorMessage: (String) -> Unit,
-    ) {
-        auth
-            .createUserWithEmailAndPassword(email, password)
-            .addOnSuccessListener { result ->
+    @Inject
+    constructor(
+        private val auth: FirebaseAuth,
+        private val userRepository: UserRepository,
+    ) : ViewModel() {
+        fun registerUser(
+            email: String,
+            password: String,
+            user: User,
+            onSuccessMessage: (String) -> Unit,
+            onErrorMessage: (String) -> Unit,
+        ) {
+            auth
+                .createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener { result ->
 
-                val uid = result.user?.uid
-                if (uid == null) {
-                    onErrorMessage("Error obteniendo el UID del usuario")
-                    return@addOnSuccessListener
-                }
-
-                val userWithId = user.copy(id = uid)
-
-                viewModelScope.launch {
-                    try {
-                        userRepository.saveUser(userWithId)
-                        onSuccessMessage("Usuario registrado con éxito")
-                    } catch (e: Exception) {
-                        onErrorMessage("Error al guardar datos: ${e.message}")
+                    val uid = result.user?.uid
+                    if (uid == null) {
+                        onErrorMessage("Error obteniendo el UID del usuario")
+                        return@addOnSuccessListener
                     }
+
+                    val userWithId = user.copy(id = uid)
+
+                    viewModelScope.launch {
+                        try {
+                            userRepository.saveUser(userWithId)
+                            onSuccessMessage("Usuario registrado con éxito")
+                        } catch (e: Exception) {
+                            onErrorMessage("Error al guardar datos: ${e.message}")
+                        }
+                    }
+                }.addOnFailureListener {
+                    onErrorMessage("Error al registrar: ${it.message}")
                 }
-            }.addOnFailureListener {
-                onErrorMessage("Error al registrar: ${it.message}")
-            }
+        }
     }
-}
 
 @HiltViewModel
 class LoginViewModel
-@Inject
-constructor(
-    private val userRepository: UserRepository,
-    private val auth: FirebaseAuth,
-) : ViewModel() {
-    private val _loginResult = MutableStateFlow<Boolean?>(null)
-    val loginResult: StateFlow<Boolean?> = _loginResult.asStateFlow()
+    @Inject
+    constructor(
+        private val userRepository: UserRepository,
+        private val auth: FirebaseAuth,
+    ) : ViewModel() {
+        private val _loginResult = MutableStateFlow<Boolean?>(null)
+        val loginResult: StateFlow<Boolean?> = _loginResult.asStateFlow()
 
-    fun login(
-        email: String,
-        password: String,
-    ) {
-        auth
-            .signInWithEmailAndPassword(email, password)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    val user = auth.currentUser
-                    Log.d("Auth", "User after login: ${user?.uid}")
-                    _loginResult.value = true
-                } else {
-                    Log.e("Auth", "Login failed: ${task.exception?.message}")
-                    _loginResult.value = false
+        fun login(
+            email: String,
+            password: String,
+        ) {
+            auth
+                .signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val user = auth.currentUser
+                        Log.d("Auth", "User after login: ${user?.uid}")
+                        _loginResult.value = true
+                    } else {
+                        Log.e("Auth", "Login failed: ${task.exception?.message}")
+                        _loginResult.value = false
+                    }
                 }
-            }
-    }
+        }
 
-    fun getCurrentUser(): User? {
-        val uid = auth.currentUser?.uid ?: return null
-        // Podés usar repository para traer info extra del usuario
-        return runBlocking { userRepository.getUser(uid) }
+        fun getCurrentUser(): User? {
+            val uid = auth.currentUser?.uid ?: return null
+            // Podés usar repository para traer info extra del usuario
+            return runBlocking { userRepository.getUser(uid) }
+        }
     }
-}

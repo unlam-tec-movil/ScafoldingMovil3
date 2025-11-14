@@ -243,8 +243,14 @@ fun MapPostScreen(
                 pendingLatLng = null
                 Toast.makeText(context, "Pin guardado correctamente", Toast.LENGTH_SHORT).show()
                 when (tipoDePublicacion) {
-                    TipoDePublicacion.MASCOTAPERDIDA -> navController.navigate("post_missing_pet_screen")
-                    TipoDePublicacion.MASCOTAENCONTRADA -> navController.navigate("post_found_pet_screen")
+                    TipoDePublicacion.MASCOTAPERDIDA ->
+                        navController.navigate(
+                            "post_missing_pet_screen",
+                        )
+                    TipoDePublicacion.MASCOTAENCONTRADA ->
+                        navController.navigate(
+                            "post_found_pet_screen",
+                        )
 
                     else -> {
                         Toast
@@ -267,8 +273,7 @@ fun CirculoDecorativoMapa(modifier: Modifier = Modifier) {
                 .height(500.dp)
                 .graphicsLayer {
                     scaleX = 1.5f
-                }
-                .background(
+                }.background(
                     color = ColorTwo,
                     shape = RoundedCornerShape(180.dp),
                 ),

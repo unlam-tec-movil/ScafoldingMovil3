@@ -273,8 +273,7 @@ fun SearchScreen(
                         .background(
                             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
                             shape = RoundedCornerShape(50),
-                        )
-                        .padding(4.dp),
+                        ).padding(4.dp),
             ) {
                 SegmentedButton(
                     selected = uiState.searchMode == SearchMode.ROUTE,
@@ -340,8 +339,7 @@ fun SearchScreen(
                         .background(
                             color = MaterialTheme.colorScheme.errorContainer,
                             shape = RoundedCornerShape(8.dp),
-                        )
-                        .padding(12.dp),
+                        ).padding(12.dp),
             )
         }
     }

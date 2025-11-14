@@ -6,5 +6,5 @@ import jakarta.inject.Inject
 
 @HiltViewModel
 class UserViewModel
-@Inject
-constructor() : ViewModel()
+    @Inject
+    constructor() : ViewModel()

@@ -17,10 +17,10 @@ import javax.inject.Inject
 // * - Operaciones de lectura/escritura
 // */
 class PinLocalDataSource
-@Inject
-constructor(
-    @ApplicationContext private val context: Context,
-) {
+    @Inject
+    constructor(
+        @ApplicationContext private val context: Context,
+    ) {
 //        /**
 //         * Obtiene todos los pins guardados en DataStore.
 //         */
@@ -46,4 +46,4 @@ constructor(
 //            } catch (e: Exception) {
 //                false
 //            }
-}
+    }

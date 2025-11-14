@@ -478,12 +478,10 @@ fun CirXD(modifier: Modifier = Modifier) {
                 .height(500.dp)
                 .graphicsLayer {
                     scaleX = 1.5f
-                }
-                .shadow(
+                }.shadow(
                     elevation = 8.dp,
                     shape = RoundedCornerShape(180.dp),
-                )
-                .background(
+                ).background(
                     color = Color.White,
                     shape = RoundedCornerShape(180.dp),
                 ),

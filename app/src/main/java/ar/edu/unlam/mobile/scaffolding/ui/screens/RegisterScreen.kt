@@ -274,7 +274,10 @@ fun CreateButton(
     Button(
         onClick = {
             when {
-                email.isBlank() || phone.isBlank() || password.isBlank() || confirmPassword.isBlank() -> {
+                email.isBlank() ||
+                    phone.isBlank() ||
+                    password.isBlank() ||
+                    confirmPassword.isBlank() -> {
                     Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_LONG).show()
                 }
 

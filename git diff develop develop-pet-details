@@ -1,0 +1,129 @@
+*   [33m3089d9c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdevelop-pet-details[m[33m, [m[1;31morigin/develop-pet-details[m[33m, [m[1;31morigin/develop[m[33m, [m[1;32mdevelop[m[33m)[m Merge pull request #33 from unlam-tec-movil/feature/busqueda-mapa-radar
+[31m|[m[32m\[m  
+[31m|[m * [33mbf27005[m[33m ([m[1;31morigin/feature/busqueda-mapa-radar[m[33m)[m Fix: errores ktlint
+[31m|[m * [33ma9e7fa4[m Fix: errores ktlint
+[31m|[m * [33me409688[m Ignorar archivo 'nul' en el sistema
+[31m|[m * [33m4883994[m [Refactor] Unificar Pet (DTO/Domain) y conectar flujo de datos reales traidos de Firebase a SearchScreen
+[31m|[m *   [33m23f53b3[m Merge branch 'develop' into feature/busqueda-mapa-radar
+[31m|[m [33m|[m[31m\[m  
+[31m|[m [33m|[m[31m/[m  
+[31m|[m[31m/[m[33m|[m   
+* [33m|[m   [33m293e7ea[m Merge pull request #32 from unlam-tec-movil/config
+[35m|[m[36m\[m [33m\[m  
+[35m|[m * [33m\[m   [33m6f59415[m[33m ([m[1;31morigin/config[m[33m)[m Merge remote-tracking branch 'origin/config' into config
+[35m|[m [1;31m|[m[1;32m\[m [33m\[m  
+[35m|[m [1;31m|[m * [33m|[m [33m5b04a46[m .
+[35m|[m [1;31m|[m * [33m|[m   [33mf6c13f2[m Merge branch 'develop' into config
+[35m|[m [1;31m|[m [1;33m|[m[35m\[m [33m\[m  
+[35m|[m [1;31m|[m[35m_[m[1;33m|[m[35m/[m [33m/[m  
+[35m|[m[35m/[m[1;31m|[m [1;33m|[m [33m|[m   
+[35m|[m [1;31m|[m * [33m|[m [33m400b62b[m Pantalla configuracion y animacion en particulas flotantes.
+[35m|[m * [1;34m|[m [33m|[m [33m8ae129d[m zzz
+[35m|[m * [1;34m|[m [33m|[m [33mdb1b30c[m .
+[35m|[m * [1;34m|[m [33m|[m [33m45e19e9[m Pantalla configuracion y animacion en particulas flotantes.
+[35m|[m[35m/[m [1;34m/[m [33m/[m  
+* [1;34m|[m [33m|[m   [33m9a7ed5a[m Merge pull request #31 from unlam-tec-movil/KiaraLBbranch
+[1;35m|[m[1;36m\[m [1;34m\[m [33m\[m  
+[1;35m|[m * [1;34m|[m [33m|[m [33m12cb7c1[m[33m ([m[1;31morigin/KiaraLBbranch[m[33m)[m -
+[1;35m|[m * [1;34m|[m [33m|[m [33mf63d697[m -
+[1;35m|[m * [1;34m|[m [33m|[m   [33m7a578c4[m Merge remote-tracking branch 'origin/develop' into KiaraLBbranch
+[1;35m|[m [31m|[m[1;35m\[m [1;34m\[m [33m\[m  
+[1;35m|[m [31m|[m[1;35m/[m [1;34m/[m [33m/[m  
+[1;35m|[m[1;35m/[m[31m|[m [1;34m|[m [33m|[m   
+* [31m|[m [1;34m|[m [33m|[m   [33m3e3e538[m Merge pull request #29 from unlam-tec-movil/develop-cacaman
+[1;34m|[m[34m\[m [31m\[m [1;34m\[m [33m\[m  
+[1;34m|[m [34m|[m[1;34m_[m[31m|[m[1;34m/[m [33m/[m  
+[1;34m|[m[1;34m/[m[34m|[m [31m|[m [33m|[m   
+[1;34m|[m * [31m|[m [33m|[m [33m05363ec[m[33m ([m[1;31morigin/develop-cacaman[m[33m)[m Ktlint format hecho
+[1;34m|[m * [31m|[m [33m|[m [33med873f2[m Ktlint format hecho
+[1;34m|[m * [31m|[m [33m|[m [33m8a2e720[m Ktlint format hecho
+[1;34m|[m * [31m|[m [33m|[m [33md037e2d[m mergeo de la rama de kiara y la cacaman en una sola, en un commit
+[1;34m|[m[1;34m/[m [31m/[m [33m/[m  
+[1;34m|[m * [33m|[m [33m285e0bc[m Pantallas de misPosts + navegación de crear un post
+[1;34m|[m * [33m|[m [33m1578910[m[33m ([m[1;32mKiaraLBbranch[m[33m)[m cambio de pines datastore a firestore
+[1;34m|[m * [33m|[m [33m6f2a7fe[m Implementación de cámara + filtros
+[1;34m|[m[1;34m/[m [33m/[m  
+* [33m|[m   [33m9100298[m Merge pull request #25 from unlam-tec-movil/login/register
+[35m|[m[36m\[m [33m\[m  
+[35m|[m * [33m|[m [33md19720d[m[33m ([m[1;31morigin/login/register[m[33m)[m a
+[35m|[m * [33m|[m [33m58eb17e[m a
+[35m|[m * [33m|[m [33m9381d13[m a
+[35m|[m * [33m|[m   [33mcfb9925[m Merge remote-tracking branch 'origin/login/register' into login/register
+[35m|[m [1;31m|[m[1;32m\[m [33m\[m  
+[35m|[m [1;31m|[m * [33m\[m   [33m076d90b[m Merge branch 'develop' into login/register
+[35m|[m [1;31m|[m [1;33m|[m[35m\[m [33m\[m  
+[35m|[m [1;31m|[m[35m_[m[1;33m|[m[35m/[m [33m/[m  
+[35m|[m[35m/[m[1;31m|[m [1;33m|[m [33m|[m   
+[35m|[m * [1;33m|[m [33m|[m [33m40db8d8[m a
+[35m|[m * [1;33m|[m [33m|[m   [33m63f04b6[m Merge remote-tracking branch 'origin/develop' into login/register
+[35m|[m [1;33m|[m[35m\[m [1;33m\[m [33m\[m  
+[35m|[m [1;33m|[m[35m/[m [1;33m/[m [33m/[m  
+[35m|[m[35m/[m[1;33m|[m [1;33m/[m [33m/[m   
+[35m|[m [1;33m|[m[1;33m/[m [33m/[m    
+[35m|[m * [33m|[m [33m92919f8[m navegación/splashscreen
+[35m|[m * [33m|[m [33m3eb3620[m Posts-firestore
+[35m|[m * [33m|[m   [33m2dd1578[m Merge branch 'develop' into login/register
+[35m|[m [31m|[m[32m\[m [33m\[m  
+[35m|[m * [32m|[m [33m|[m [33m67d4994[m Pantallas de login y register + firestore para almacenamiento de usarios
+[35m|[m [32m|[m [32m|[m * [33m34f1192[m [Fix] Solucionar rotación de la flecha en modo Radar, y mejorar UX
+[35m|[m [32m|[m [32m|[m * [33mf920cea[m [Feat] Implementar pantalla de búsqueda + funcionalidad de Radar
+[35m|[m [32m|[m[35m_[m[32m|[m[35m/[m  
+[35m|[m[35m/[m[32m|[m [32m|[m   
+* [32m|[m [32m|[m   [33mfbd3071[m Merge pull request #21 from unlam-tec-movil/feature/mapa-permisos
+[33m|[m[34m\[m [32m\[m [32m\[m  
+[33m|[m * [32m|[m [32m|[m [33m477dbf9[m[33m ([m[1;31morigin/feature/mapa-permisos[m[33m)[m [Style] Aplicar formato ktlint
+[33m|[m * [32m|[m [32m|[m [33m108c4fc[m [Refactor] Aplicar Arquitectura Hexagonal a Location y Pins
+[33m|[m * [32m|[m [32m|[m [33m1ba8b14[m [Fixed] Corregir bloque de dependencias anidadas y duplicados de maps
+[33m|[m[33m/[m [32m/[m [32m/[m  
+* [32m|[m [32m|[m   [33mfe6fe57[m Merge pull request #20 from unlam-tec-movil/Bars
+[32m|[m[36m\[m [32m\[m [32m\[m  
+[32m|[m [36m|[m[32m_[m[32m|[m[32m/[m  
+[32m|[m[32m/[m[36m|[m [32m|[m   
+[32m|[m * [32m|[m [33m5ad2f3a[m[33m ([m[1;31morigin/Bars[m[33m)[m Agrego icono y cambio nombre de la App
+[32m|[m * [32m|[m [33mdbff76c[m[33m ([m[1;32mBars[m[33m)[m Top bar, bottonbar y primer redisenio profile
+[32m|[m[32m/[m [32m/[m  
+* [32m|[m   [33mce524aa[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Merge pull request #18 from unlam-tec-movil/develop-cacaman-fix
+[1;31m|[m[1;32m\[m [32m\[m  
+[1;31m|[m * [32m|[m [33mdbe6fa4[m 🚨 Remove unused imports
+[1;31m|[m * [32m|[m [33m09901f4[m 🚨 Fix ktlint issues
+[1;31m|[m * [32m|[m [33m5987cd6[m 🚨 Ktlint & Android Lint
+[1;31m|[m * [32m|[m [33m4ea50ac[m código organizado antes de pull request
+[1;31m|[m * [32m|[m [33m54be272[m código organizado antes de pull request
+[1;31m|[m * [32m|[m [33mf0b12cf[m push de prueba
+[1;31m|[m[1;31m/[m [32m/[m  
+* [32m|[m   [33mccbf743[m Merge pull request #17 from unlam-tec-movil/barraInferior
+[32m|[m[1;34m\[m [32m\[m  
+[32m|[m [1;34m|[m[32m/[m  
+[32m|[m[32m/[m[1;34m|[m   
+[32m|[m * [33m41ebb25[m[33m ([m[1;31morigin/barraInferior[m[33m)[m Personal Details
+[32m|[m * [33m023c670[m Personal Details
+[32m|[m * [33m368ac05[m Personal Details
+[32m|[m * [33m6bba4de[m Pantalla de configuracion
+[32m|[m * [33m220c0f0[m Barra de navegacion, iconos y colores. Prueba.
+[32m|[m * [33m75de150[m Barra de navegacion, iconos y colores. Prueba.
+[32m|[m * [33m24f9a35[m 🔧 Set min file to 60
+[32m|[m * [33m89a57b3[m 💚 Remove codecov
+[32m|[m * [33ma944c02[m ✅ Min coverage
+[32m|[m * [33mbbb2270[m Barra de navegacion, iconos y colores. Prueba.
+[32m|[m[32m/[m  
+* [33m9f3357e[m 🔥 Remove Hello text
+* [33mcbe91ef[m ⬆️ AGP 8.13.0
+* [33m543378b[m 🩹 Remove unused import
+* [33m6901246[m ✨ Form example
+* [33m6664df2[m ⬆️ AGP 8.12.2
+*   [33mddf4109[m Merge pull request #1 from unlam-tec-movil/feature/2025-2-updates
+[1;35m|[m[1;36m\[m  
+[1;35m|[m *   [33mf3e3cd2[m Merge branch 'main' into feature/2025-2-updates
+[1;35m|[m [31m|[m[1;35m\[m  
+[1;35m|[m [31m|[m[1;35m/[m  
+[1;35m|[m[1;35m/[m[31m|[m   
+* [31m|[m [33m433af22[m chore: :arrow_up: update AGP to 8.10.0
+* [31m|[m [33m986b632[m chore: :arrow_up: update AGP to 8.9.2
+* [31m|[m [33m96a80a5[m Agrego texto de prueba en Greeting
+* [31m|[m [33m2f1da53[m update AGP, rearrange directories, update README
+[32m|[m * [33m0ff380f[m ⬆️ Go to sdk version 36
+[32m|[m * [33m0d6a177[m 🩹 Fix selected attribute at user/id menu button
+[32m|[m * [33m81add54[m 🔧 Add Composable rule to detekt
+[32m|[m * [33m683f01c[m ⬆️ Update to kotlin 2.20.0 & Gradle 8.13
+[32m|[m[32m/[m  
+* [33m456aa6f[m Initial commit

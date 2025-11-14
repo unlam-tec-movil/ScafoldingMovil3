@@ -123,7 +123,10 @@ fun PostFoundPet(
                     text =
                         "Completa los datos de " +
                             "la mascota encontrada.",
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold),
+                    style =
+                        MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                        ),
                     color = Color.White,
                     modifier = Modifier.padding(bottom = 16.dp),
                 )
