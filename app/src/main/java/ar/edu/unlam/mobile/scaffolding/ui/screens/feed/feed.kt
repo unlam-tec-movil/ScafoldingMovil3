@@ -68,11 +68,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import ar.edu.unlam.mobile.scaffolding.data.dto.Gender
-import ar.edu.unlam.mobile.scaffolding.data.dto.PetDto
-import ar.edu.unlam.mobile.scaffolding.data.dto.Status
-import ar.edu.unlam.mobile.scaffolding.data.dto.TipoDePublicacion
-import ar.edu.unlam.mobile.scaffolding.data.dto.Type
+import ar.edu.unlam.mobile.scaffolding.domain.model.Gender
+import ar.edu.unlam.mobile.scaffolding.domain.model.Pet
+import ar.edu.unlam.mobile.scaffolding.domain.model.Status
+import ar.edu.unlam.mobile.scaffolding.domain.model.TipoDePublicacion
+import ar.edu.unlam.mobile.scaffolding.domain.model.Type
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostCard
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorOne
@@ -167,7 +167,7 @@ fun FeedScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PetFeed(
-    pets: List<PetDto>,
+    pets: List<Pet>,
     onPetClick: (String) -> Unit,
 ) {
     LazyVerticalGrid(

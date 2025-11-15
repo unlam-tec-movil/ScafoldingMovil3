@@ -16,8 +16,6 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.Pet as PetDomain
 
 /**
  * Implementación del repositorio de mascotas.
- *
- * Responsabilidad:
  * - Conecta con Firebase Firestore
  * - Convierte entre PetDto (Firebase) y Pet (dominio) usando mappers
  * - Implementa la interfaz PetsRepository del dominio
