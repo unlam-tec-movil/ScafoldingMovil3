@@ -11,8 +11,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+/**
+ * Diálogo para confirmar la ubicación seleccionada en el mapa.
+ *
+ * Se usa en MapPostScreen para que el usuario confirme la latitud y longitud
+ * antes de pasarla al PostViewModel.
+ */
 @Composable
-fun AddPinDialog(
+fun ConfirmLocationDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -37,5 +43,5 @@ fun AddPinDialog(
 @Preview
 @Composable
 fun Preview() {
-    AddPinDialog({}, {})
+    ConfirmLocationDialog({}, {})
 }

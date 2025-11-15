@@ -36,10 +36,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import ar.edu.unlam.mobile.scaffolding.data.dto.Gender
-import ar.edu.unlam.mobile.scaffolding.data.dto.PetDto
-import ar.edu.unlam.mobile.scaffolding.data.dto.Status
-import ar.edu.unlam.mobile.scaffolding.data.dto.Type
+import ar.edu.unlam.mobile.scaffolding.domain.model.Gender
+import ar.edu.unlam.mobile.scaffolding.domain.model.Pet
+import ar.edu.unlam.mobile.scaffolding.domain.model.Status
+import ar.edu.unlam.mobile.scaffolding.domain.model.Type
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorTwo
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,7 +82,7 @@ fun PostFoundPet(
                             selectedType != null
                         ) {
                             val pet =
-                                PetDto(
+                                Pet(
                                     name = "",
                                     seenAt = seenAt,
                                     locality = locality,

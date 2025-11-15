@@ -18,9 +18,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import ar.edu.unlam.mobile.scaffolding.domain.loadMarkerDescriptorFromUrl
-import ar.edu.unlam.mobile.scaffolding.ui.components.AddPinDialog
 import ar.edu.unlam.mobile.scaffolding.ui.components.ShowPermissionDenied
+import ar.edu.unlam.mobile.scaffolding.ui.utils.map.loadMarkerDescriptorFromUrl
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.isGranted
@@ -39,11 +38,15 @@ import com.google.maps.android.compose.rememberCameraPositionState
 const val MAP_ROUTE = "map"
 
 /**
- * Pantalla del mapa con ubicación del usuario y gestión de pins.
- * Observa estados del MapViewModel (StateFlow).
- * Arquitectura limpia: usa Pin del dominio y PinRepository.
+ * Pantalla del mapa principal con todas las mascotas.
+ *
+ * Responsabilidad:
+ * - Mostrar la ubicación del usuario
+ * - Mostrar todas las mascotas (Pet) en el mapa como markers
+ * - Permitir interacción con los markers para ver detalles
+ *
+ * Arquitectura limpia: usa Pet del dominio y PetsRepository.
  */
-
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
@@ -53,7 +56,7 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
     // ===== OBSERVAR ESTADOS DEL VIEWMODEL =====
     val currentLocation by viewModel.currentLocation.collectAsState()
     val isLoadingLocation by viewModel.isLoadingLocation.collectAsState()
-    val pins by viewModel.pins.collectAsState()
+    val pets by viewModel.pets.collectAsState()
 
     // ===== MANEJO DE PERMISOS CON ACCOMPANIST =====
     val locationPermissionState =
@@ -72,13 +75,9 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
         }
     }
 
-    // ===== GESTIÓN DE PINS =====
-    var pendingLatLng by remember { mutableStateOf<LatLng?>(null) }
-
-    // Cargar pins desde el ViewModel al entrar
-    LaunchedEffect(Unit) {
-        viewModel.loadPins()
-    }
+    // ===== GESTIÓN DE MASCOTAS =====
+    // Las mascotas se cargan automáticamente en el init{} del ViewModel
+    // mediante petsRepository.getAllPets() (Flow reactivo)
 
     // ========== NOTIFICAR AL VIEWMODEL SOBRE CAMBIOS DE PERMISO ==========
     LaunchedEffect(locationPermissionState.status.isGranted) {
@@ -138,36 +137,34 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                     zoomControlsEnabled = false,
                     compassEnabled = true,
                 ),
-            onMapLongClick = { latLng ->
-                // Abrir diálogo para agregar un nuevo pin
-                pendingLatLng = latLng
-            },
         ) {
-            // Renderizar pins (Observa desde ViewModel, usa modelo Pin del dominio)
-            pins.forEach { pin ->
+            // Renderizar mascotas (Observa desde ViewModel, usa modelo Pet del dominio)
+            pets.forEach { pet ->
+                val position = LatLng(pet.latitude, pet.longitude)
 
-                val position = LatLng(pin.latitude, pin.longitude)
-                // si aún no tenemos el ícono de este pet, lo disparamos
-                val hasIcon = markerIcons.containsKey(pin.id)
+                // Verificar si ya tenemos el ícono de esta mascota
+                val hasIcon = markerIcons.containsKey(pet.id)
 
                 if (hasIcon) {
                     Marker(
                         state = MarkerState(position),
-                        icon = markerIcons[pin.id],
+                        icon = markerIcons[pet.id],
                         anchor = Offset(0.5f, 0.5f),
-                        title = "Mascota",
+                        title = pet.name.ifBlank { "Mascota" },
+                        snippet = "${pet.type} - ${pet.status}",
                     )
                 }
-                // carga asíncrona del icono
-                LaunchedEffect(pin.id, pin.imageUrl) {
-                    if (!markerIcons.containsKey(pin.id)) {
+
+                // Carga asíncrona del ícono desde la URL
+                LaunchedEffect(pet.id, pet.imageUrl) {
+                    if (!markerIcons.containsKey(pet.id)) {
                         val desc =
                             loadMarkerDescriptorFromUrl(
                                 context = context,
-                                url = pin.imageUrl,
+                                url = pet.imageUrl,
                             )
                         if (desc != null) {
-                            markerIcons[pin.id] = desc
+                            markerIcons[pet.id] = desc
                         }
                     }
                 }
@@ -183,23 +180,5 @@ fun MapScreen(viewModel: MapViewModel = hiltViewModel()) {
                         .padding(16.dp),
             )
         }
-    }
-
-    // ========== DIÁLOGO PARA AGREGAR PIN ==========
-
-    if (pendingLatLng != null) {
-        AddPinDialog(
-            onConfirm = {
-                // La UI solo pasa los datos.
-                viewModel.savePin(
-                    // TODO: modificar esto para que en vés de guardarlo por separado,
-                    // se guarde en la publicación del perro
-                    latitude = pendingLatLng!!.latitude,
-                    longitude = pendingLatLng!!.longitude,
-                )
-                pendingLatLng = null
-            },
-            onDismiss = { pendingLatLng = null },
-        )
     }
 }

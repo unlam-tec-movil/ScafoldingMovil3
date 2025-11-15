@@ -2,16 +2,15 @@ package ar.edu.unlam.mobile.scaffolding.domain.model
 
 /**
  * Modelo de dominio para Pet.
- *
- * Representa una mascota en la capa de dominio con toda la información necesaria
- * para mostrar detalles y contactar al dueño.
+ * Este modelo usa enums del dominio (Type, Status, Gender) para garantizar
+ * type-safety en toda la aplicación.
  */
 data class Pet(
     val id: String = "",
     val name: String = "",
-    val type: String = "",
-    val status: String = "",
-    val gender: String = "",
+    val type: Type = Type.OTHER,
+    val status: Status = Status.LOST,
+    val gender: Gender = Gender.MALE,
     val seenAt: String = "",
     val locality: String = "",
     val latitude: Double = 0.0,
