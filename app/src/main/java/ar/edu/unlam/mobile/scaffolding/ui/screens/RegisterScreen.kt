@@ -3,7 +3,15 @@ package ar.edu.unlam.mobile.scaffolding.ui.screens
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -12,9 +20,18 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -257,12 +274,19 @@ fun CreateButton(
     Button(
         onClick = {
             when {
-                email.isBlank() || phone.isBlank() || password.isBlank() || confirmPassword.isBlank() -> {
+                email.isBlank() ||
+                    phone.isBlank() ||
+                    password.isBlank() ||
+                    confirmPassword.isBlank() -> {
                     Toast.makeText(context, "Completa todos los campos", Toast.LENGTH_LONG).show()
                 }
+
                 password != confirmPassword -> {
-                    Toast.makeText(context, "Las contraseñas no coinciden", Toast.LENGTH_LONG).show()
+                    Toast
+                        .makeText(context, "Las contraseñas no coinciden", Toast.LENGTH_LONG)
+                        .show()
                 }
+
                 else -> {
                     val user =
                         User(

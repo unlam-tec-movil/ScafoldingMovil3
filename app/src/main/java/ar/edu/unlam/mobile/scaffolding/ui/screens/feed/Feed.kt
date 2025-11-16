@@ -79,8 +79,6 @@ import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorOne
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorTwo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.PetFinderFont
 import ar.edu.unlam.mobile.scaffolding.ui.theme.SoftGray
-import kotlin.String
-import kotlin.Unit
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -275,7 +273,10 @@ fun FilterContent(
                     viewModel.setGenderFilter(selectedGender)
                     viewModel.setLocalityFilter(locality.ifBlank { null })
                 },
-                modifier = Modifier.weight(1f).height(50.dp),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .height(50.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = ColorTwo),
             ) {
                 Text("Aplicar", color = Color.White)
@@ -288,7 +289,10 @@ fun FilterContent(
                     locality = ""
                     viewModel.clearFilters()
                 },
-                modifier = Modifier.weight(1f).height(50.dp),
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .height(50.dp),
                 border = BorderStroke(2.dp, ColorOne),
             ) {
                 Text("Limpiar", color = Color(0xFFD92656))
@@ -526,12 +530,14 @@ fun PublishButton(
                         .background(ColorTwo.copy(alpha = 0.9f), RoundedCornerShape(16.dp))
                         .padding(12.dp),
             ) {
-                TextButton(onClick = {
-                    viewModel.setPostTipo(TipoDePublicacion.MASCOTAPERDIDA)
-                    Log.d("DEBUG", "VM PublishButton: ${viewModel.hashCode()}")
+                TextButton(
+                    onClick = {
+                        viewModel.setPostTipo(TipoDePublicacion.MASCOTAPERDIDA)
+                        Log.d("DEBUG", "VM PublishButton: ${viewModel.hashCode()}")
 
-                    navController.navigate("map_post_screen")
-                }) {
+                        navController.navigate("map_post_screen")
+                    },
+                ) {
                     Icon(
                         imageVector = Icons.Default.HeartBroken,
                         contentDescription = "Perdí a mi mascota",
@@ -540,10 +546,12 @@ fun PublishButton(
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Perdí a mi mascota", color = Color.White)
                 }
-                TextButton(onClick = {
-                    viewModel.setPostTipo(TipoDePublicacion.MASCOTAENCONTRADA)
-                    navController.navigate("map_post_screen")
-                }) {
+                TextButton(
+                    onClick = {
+                        viewModel.setPostTipo(TipoDePublicacion.MASCOTAENCONTRADA)
+                        navController.navigate("map_post_screen")
+                    },
+                ) {
                     Icon(
                         imageVector = Icons.Default.Visibility,
                         contentDescription = "Vi una mascota perdida",
@@ -565,7 +573,10 @@ fun PublishButton(
                 imageVector = Icons.Default.Add,
                 contentDescription = "Add",
                 tint = Color.White,
-                modifier = Modifier.rotate(rotation).size(40.dp),
+                modifier =
+                    Modifier
+                        .rotate(rotation)
+                        .size(40.dp),
             )
         }
     }

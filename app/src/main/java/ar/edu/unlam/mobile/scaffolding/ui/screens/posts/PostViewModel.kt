@@ -102,7 +102,13 @@ class PostViewModel
                     pet.status == status &&
                         (type == null || pet.type == type) &&
                         (gender == null || pet.gender == gender) &&
-                        (locality.isNullOrBlank() || pet.locality.equals(locality, ignoreCase = true))
+                        (
+                            locality.isNullOrBlank() ||
+                                pet.locality.equals(
+                                    locality,
+                                    ignoreCase = true,
+                                )
+                        )
                 }
             }.stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
 

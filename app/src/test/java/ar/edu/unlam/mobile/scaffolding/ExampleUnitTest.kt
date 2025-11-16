@@ -1,6 +1,6 @@
 package ar.edu.unlam.mobile.scaffolding
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**

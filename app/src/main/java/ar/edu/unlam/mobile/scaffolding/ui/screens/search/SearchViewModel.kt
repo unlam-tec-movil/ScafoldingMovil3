@@ -105,6 +105,7 @@ class SearchViewModel
                     // Activar el listener de sensores
                     startListeningToSensors()
                 }
+
                 SearchMode.ROUTE -> {
                     // Desactivar el listener de sensores
                     stopListeningToSensors()
@@ -168,7 +169,9 @@ class SearchViewModel
                         _uiState.update {
                             it.copy(
                                 isLoadingLocation = false,
-                                errorMessage = exception.message ?: "Error al obtener ubicación continua",
+                                errorMessage =
+                                    exception.message
+                                        ?: "Error al obtener ubicación continua",
                             )
                         }
                     }.launchIn(viewModelScope)

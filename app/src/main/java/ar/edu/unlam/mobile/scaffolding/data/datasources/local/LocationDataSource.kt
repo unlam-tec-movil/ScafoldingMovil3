@@ -51,7 +51,10 @@ class LocationDataSource
                 // Configurar petición de ubicación
                 val locationRequest =
                     LocationRequest
-                        .Builder(Priority.PRIORITY_HIGH_ACCURACY, 5000L) // Actualización cada 5 segundos
+                        .Builder(
+                            Priority.PRIORITY_HIGH_ACCURACY,
+                            5000L,
+                        ) // Actualización cada 5 segundos
                         .setMinUpdateIntervalMillis(2000L) // Mínimo 2 segundos entre actualizaciones
                         .setWaitForAccurateLocation(false)
                         .build()

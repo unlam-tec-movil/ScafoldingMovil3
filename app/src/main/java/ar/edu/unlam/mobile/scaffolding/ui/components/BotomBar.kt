@@ -91,9 +91,12 @@ fun BottomBar(
                     )
 
                 items.forEach { item ->
-                    val selected = currentRoute?.contains(item.matchRoute.substringBefore("/")) == true
+                    val selected =
+                        currentRoute?.contains(item.matchRoute.substringBefore("/")) == true
                     val iconColor by animateColorAsState(if (selected) Color.White else inactive)
-                    val backgroundColor by animateColorAsState(if (selected) accent else Color.Transparent)
+                    val backgroundColor by animateColorAsState(
+                        if (selected) accent else Color.Transparent,
+                    )
                     val paddingAnim by animateDpAsState(if (selected) 6.dp else 10.dp)
 
                     NavigationBarItem(

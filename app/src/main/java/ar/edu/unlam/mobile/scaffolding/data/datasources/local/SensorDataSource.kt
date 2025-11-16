@@ -53,6 +53,7 @@ class SensorDataSource
                                     // Marcar que ya tenemos datos del acelerómetro
                                     hasAccelerometerData = true
                                 }
+
                                 Sensor.TYPE_MAGNETIC_FIELD -> {
                                     // Copia los valores del magnetómetro
                                     System.arraycopy(
@@ -84,7 +85,8 @@ class SensorDataSource
                                     // orientationAngles[0] es al azimut en radianes (-π a π)
                                     // Lo convertimos a grados (0-360)
                                     val azimuthRadians = orientationAngles[0]
-                                    val azimuthDegrees = Math.toDegrees(azimuthRadians.toDouble()).toFloat()
+                                    val azimuthDegrees =
+                                        Math.toDegrees(azimuthRadians.toDouble()).toFloat()
 
                                     // Normalizar a 0-360
                                     val normalizedAzimuth =
