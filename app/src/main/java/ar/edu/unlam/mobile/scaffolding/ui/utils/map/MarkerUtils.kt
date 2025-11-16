@@ -1,4 +1,4 @@
-package ar.edu.unlam.mobile.scaffolding.domain
+package ar.edu.unlam.mobile.scaffolding.ui.utils.map
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -13,6 +13,23 @@ import coil.request.ImageRequest
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 
+/*
+ * Utilidades para crear markers personalizados en Google Maps.
+ *
+ * Este archivo pertenece a la capa UI porque:
+ * - Depende de Android (Context, Bitmap, Canvas)
+ * - Usa librerías de UI (Coil para cargar imágenes)
+ * - Maneja componentes específicos de Maps (BitmapDescriptor)
+ */
+
+/**
+ * Carga una imagen desde una URL y la convierte en un BitmapDescriptor
+ * circular con borde para usar como marker en Google Maps.
+ *
+ * @param context Context de Android (necesario para Coil)
+ * @param url URL de la imagen a cargar
+ * @return BitmapDescriptor circular con borde, o null si falla la carga
+ */
 suspend fun loadMarkerDescriptorFromUrl(
     context: Context,
     url: String,
@@ -31,6 +48,12 @@ suspend fun loadMarkerDescriptorFromUrl(
     return BitmapDescriptorFactory.fromBitmap(circular)
 }
 
+/**
+ * Crea un Bitmap circular con borde a partir de una imagen.
+ *
+ * @param avatarBitmap Imagen original a convertir
+ * @return Bitmap circular de 160x160 con borde fucsia
+ */
 fun createCircularMarkerBitmap(avatarBitmap: Bitmap): Bitmap {
     val size = 160
     val border = 10f

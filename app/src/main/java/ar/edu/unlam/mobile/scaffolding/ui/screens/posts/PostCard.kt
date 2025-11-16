@@ -25,12 +25,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import ar.edu.unlam.mobile.scaffolding.data.dto.PetDto
+import ar.edu.unlam.mobile.scaffolding.domain.model.Pet
 import coil.compose.rememberAsyncImagePainter
 
 @Composable
 fun PostCard(
-    pet: PetDto,
+    pet: Pet,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
