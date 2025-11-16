@@ -222,9 +222,9 @@ fun PetDetailScreen(
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
                     DetailRow(label = "Perdido desde:", value = "03/09/2025")
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-                    DetailRow(label = "Sexo:", value = pet?.gender ?: "Macho")
+                    DetailRow(label = "Sexo:", value = pet?.gender?.label ?: "Unknown")
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-                    DetailRow(label = "Teléfono:", value = pet?.phoneNumber ?: "+54 9 11 1234 5678")
+                    DetailRow(label = "Teléfono:", value = pet?.phoneNumber ?: "11 1234 5678")
                 }
 
                 Spacer(modifier = Modifier.height(32.dp))
@@ -236,7 +236,7 @@ fun PetDetailScreen(
                     val buttonColor = Color(0xFFC2185B)
 
                     WhatsAppButton(
-                        phoneNumber = pet?.phoneNumber ?: "+54 9 11 1234 5678",
+                        phoneNumber = pet?.phoneNumber ?: "9 11 1234 5678",
                         petName = pet?.name ?: "Zeus",
                         buttonColor = buttonColor,
                         modifier = modifier,
