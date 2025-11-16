@@ -232,7 +232,7 @@ fun SearchScreen(
             cameraPositionState = cameraPositionState,
             properties =
                 MapProperties(
-                    isMyLocationEnabled = false, // Apagado para evitar Z-fighting con nuestro marker
+                    isMyLocationEnabled = false, // Apagado para evitar Z-fighting con el marker
                 ),
             uiSettings =
                 MapUiSettings(
@@ -303,7 +303,7 @@ fun SearchScreen(
             }
         }
 
-        // ===== FLECHA ROJA/VERDE FLOTANTE (MODO RADAR HUD) =====
+        // ===== FLECHA ROJA/VERDE FLOTANTE =====
         // La flecha está FIJA en el centro de la pantalla
         // Como la cámara sigue al usuario, el centro de la pantalla = ubicación del usuario
         // La flecha rota según: bearing - azimuth (apunta hacia la mascota relativo a tu orientación)
@@ -347,8 +347,7 @@ fun SearchScreen(
 
 /**
  * Componente de flecha para modo RADAR (HUD).
- * Componente "tonto" que solo renderiza según el estado recibido.
- * NO contiene lógica de negocio.
+ * Componente que solo renderiza según el estado recibido.
  *
  * Aparece fija en el centro de la pantalla.
  * Rota para apuntar hacia la mascota relativo a la orientación del dispositivo.

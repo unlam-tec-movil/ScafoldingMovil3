@@ -2,30 +2,61 @@ package ar.edu.unlam.mobile.scaffolding.ui.screens.map
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ar.edu.unlam.mobile.scaffolding.domain.model.Pin
+import ar.edu.unlam.mobile.scaffolding.domain.model.Pet
 import ar.edu.unlam.mobile.scaffolding.domain.model.UserLocation
 import ar.edu.unlam.mobile.scaffolding.domain.repository.LocationRepository
-import ar.edu.unlam.mobile.scaffolding.domain.repository.PinRepository
+import ar.edu.unlam.mobile.scaffolding.domain.repository.PetsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+/**
+ * ViewModel para MapScreen (mapa principal con todas las mascotas).
+ *
+ * Responsabilidad:
+ * - Gestionar la ubicación actual del usuario
+ * - Cargar y exponer la lista de todas las mascotas (Pet) para mostrar en el mapa
+ */
 @HiltViewModel
 class MapViewModel
     @Inject
     constructor(
         private val locationRepository: LocationRepository,
-        private val pinRepository: PinRepository,
+        private val petsRepository: PetsRepository,
     ) : ViewModel() {
-        private val _pets = MutableStateFlow<List<Pin>>(emptyList())
-        val pets: StateFlow<List<Pin>> = _pets
+        // ===== ESTADO DE MASCOTAS =====
+
+        /**
+         * Lista de todas las mascotas (Pet) para mostrar en el mapa.
+         * Trabaja con el modelo Pet del DOMINIO.
+         */
+        private val _pets = MutableStateFlow<List<Pet>>(emptyList())
+        val pets: StateFlow<List<Pet>> = _pets
+
+        /**
+         * Indica si se están cargando las mascotas.
+         */
+        private val _isLoadingPets = MutableStateFlow(false)
+        val isLoadingPets: StateFlow<Boolean> = _isLoadingPets
 
         init {
+            loadPets()
+        }
+
+        /**
+         * Carga todas las mascotas desde el repositorio.
+         */
+        private fun loadPets() {
             viewModelScope.launch {
-                // _pets.value =
-                // TODO: Obtener todas las masacotas
+                _isLoadingPets.value = true
+
+                // Observar el Flow de mascotas desde el repositorio
+                petsRepository.getAllPets().collect { petList ->
+                    _pets.value = petList
+                    _isLoadingPets.value = false
+                }
             }
         }
         // ===== ESTADO DE UBICACIÓN =====
@@ -83,107 +114,6 @@ class MapViewModel
 
                 // 4. Indica que terminó la carga
                 _isLoadingLocation.value = false
-            }
-        }
-
-        // ===== ESTADO DE PINS =====
-
-        /**
-         * Lista de pins guardados en el mapa.
-         * Trabaja con el modelo Pin del DOMINIO.
-         */
-        private val _pins = MutableStateFlow<List<Pin>>(emptyList())
-        val pins: StateFlow<List<Pin>> = _pins
-
-        /**
-         * Indica si se están cargando los pins.
-         */
-        private val _isLoadingPins = MutableStateFlow(false)
-        val isLoadingPins: StateFlow<Boolean> = _isLoadingPins
-
-        /**
-         * Carga todos los pins guardados desde el repositorio.
-         */
-        fun loadPins() {
-            viewModelScope.launch {
-                _isLoadingPins.value = true
-
-                val result = pinRepository.getAllPins()
-                result
-                    .onSuccess { pinList ->
-                        _pins.value = pinList
-                    }.onFailure {
-                        _pins.value = emptyList()
-                        // TODO: Emitir evento de error
-                    }
-
-                _isLoadingPins.value = false
-            }
-        }
-
-        init {
-            observePins()
-        }
-
-        private fun observePins() {
-            viewModelScope.launch {
-                _isLoadingPins.value = true
-
-                pinRepository.observePins().collect { pinList ->
-                    _pins.value = pinList
-                    _isLoadingPins.value = false
-                }
-            }
-        }
-
-        /**
-         * Guarda un nuevo pin.
-         *
-         * La UI solo pasa los datos primitivos. El ViewModel es responsable
-         * de crear el modelo Pin del dominio (incluyendo generar el ID).
-         */
-        fun savePin(
-            latitude: Double,
-            longitude: Double,
-        ) {
-            viewModelScope.launch {
-                // El ViewModel crea el modelo del dominio con su lógica de negocio
-                val newPin =
-                    Pin(
-                        id =
-                            java.util.UUID
-                                .randomUUID()
-                                .toString(),
-                        // Lógica de generación de ID
-                        latitude = latitude,
-                        longitude = longitude,
-                        imageUrl = "https://cdn.pixabay.com/photo/2023/04/28/12/18/dogs-7956516_640.jpg",
-                    )
-                pinRepository
-                    .savePin(newPin)
-                    .onSuccess {
-                        // Recargar la lista de pins para reflejar el cambio
-                        loadPins()
-                    }.onFailure {
-                        // TODO: Emitir evento de error
-                    }
-            }
-        }
-
-        /**
-         * Elimina un pin por su ID.
-         */
-
-        fun deletePin(pinId: String) {
-            viewModelScope.launch {
-                pinRepository
-                    .deletePin(pinId)
-                    .onSuccess {
-                        // Recargar la lista de pins para reflejar el cambio
-                        loadPins()
-                    }.onFailure {
-                        // TODO: Emitir evento de error
-                    }
             }
         }
     }

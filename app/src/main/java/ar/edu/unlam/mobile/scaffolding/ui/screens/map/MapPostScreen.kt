@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import ar.edu.unlam.mobile.scaffolding.data.dto.TipoDePublicacion
-import ar.edu.unlam.mobile.scaffolding.ui.components.AddPinDialog
+import ar.edu.unlam.mobile.scaffolding.domain.model.TipoDePublicacion
+import ar.edu.unlam.mobile.scaffolding.ui.components.ConfirmLocationDialog
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ColorTwo
 import ar.edu.unlam.mobile.scaffolding.ui.theme.PetFinderFont
@@ -52,10 +52,17 @@ import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 
-// PANTALLA QUE APARECE AL TOCAR EL BOTÓN DE SUBIR UN POST, ES PARA PONER LA
-// UBICACIÓN DE LA MASCOTA PERDIDA/ENCONTRADA.
-// NO MUESTRA PINS, SOLO PERMITE PONER UNO.
-
+/**
+ * Pantalla para seleccionar la ubicación de una mascota perdida/encontrada.
+ *
+ * Responsabilidad: Capturar SOLO la Latitud Longitud donde se vio la mascota.
+ * NO guarda nada en base de datos. La ubicación se pasa al PostViewModel (state holder).
+ *
+ * Flujo:
+ * 1. Usuario mantiene presionado en el mapa → se abre diálogo
+ * 2. Usuario confirma → se guarda LatLng en PostViewModel
+ * 3. Se navega a la siguiente pantalla del formulario
+ */
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MapPostScreen(
@@ -230,32 +237,27 @@ fun MapPostScreen(
     }
     Log.d("DEBUG", "VM MapPostScreen: ${postViewModel.hashCode()}")
 
-    // ======= DIÁLOGO PARA AGREGAR PIN =======
+    // ======= DIÁLOGO PARA CONFIRMAR UBICACIÓN =======
     if (pendingLatLng != null) {
-        AddPinDialog(
+        ConfirmLocationDialog(
             onConfirm = {
-                viewModel.savePin(
+                // Guardar la ubicación en el PostViewModel (state holder)
+                postViewModel.setSelectedLocation(
                     latitude = pendingLatLng!!.latitude,
                     longitude = pendingLatLng!!.longitude,
-                    title = title.ifBlank { "Marcador" },
-                    description = snippet.ifBlank { null },
                 )
+
                 pendingLatLng = null
-                Toast.makeText(context, "Pin guardado correctamente", Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(context, "Ubicación guardada", Toast.LENGTH_SHORT).show()
+
+                // Navegar a la siguiente pantalla del formulario
                 when (tipoDePublicacion) {
-                    TipoDePublicacion.MASCOTAPERDIDA ->
-                        navController.navigate(
-                            "post_missing_pet_screen",
-                        )
-                    TipoDePublicacion.MASCOTAENCONTRADA ->
-                        navController.navigate(
-                            "post_found_pet_screen",
-                        )
+                    TipoDePublicacion.MASCOTAPERDIDA -> navController.navigate("post_missing_pet_screen")
+                    TipoDePublicacion.MASCOTAENCONTRADA -> navController.navigate("post_found_pet_screen")
 
                     else -> {
-                        Toast
-                            .makeText(context, "Error: postMode es null", Toast.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(context, "Error: tipo de publicación no definido", Toast.LENGTH_SHORT).show()
                     }
                 }
             },

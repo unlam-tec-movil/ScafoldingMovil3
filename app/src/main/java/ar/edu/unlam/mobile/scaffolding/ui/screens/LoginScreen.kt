@@ -310,45 +310,6 @@ fun DogsFace(
 }
 
 @Composable
-fun tongue(
-    textLength: Int,
-    isFocused: Boolean,
-) {
-    val infiniteTransition = rememberInfiniteTransition()
-    val typingRotation = min(textLength * 30f, 2f)
-
-    val focusRotation = if (isFocused == true) -10f else 0f
-
-    val targetRotation = typingRotation + focusRotation
-
-    val rotation by animateFloatAsState(targetValue = targetRotation)
-
-    val stretch by infiniteTransition.animateFloat(
-        initialValue = 1f,
-        targetValue = 0.8f,
-        animationSpec =
-            infiniteRepeatable(
-                animation = tween(300, easing = LinearEasing),
-                repeatMode = RepeatMode.Reverse,
-            ),
-    )
-
-    Image(
-        painter = painterResource(id = R.drawable.dog_login_tongue),
-        contentDescription = "Stretching Dog",
-        modifier =
-            Modifier
-                .size(70.dp)
-                .offset(y = -113.dp)
-                .graphicsLayer {
-                    scaleY = stretch
-                    scaleX = 1f
-                    rotationZ = rotation
-                },
-    )
-}
-
-@Composable
 fun CampoDeTexto(
     texto: String,
     onTextChange: (String) -> Unit,

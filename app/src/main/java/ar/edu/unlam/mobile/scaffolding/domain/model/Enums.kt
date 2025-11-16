@@ -1,9 +1,10 @@
-package ar.edu.unlam.mobile.scaffolding.data.dto
+package ar.edu.unlam.mobile.scaffolding.domain.model
 
 /**
- * Enums utilizados en los DTOs de Firebase.
- *
- * Estos enums representan los valores tal como se almacenan en Firestore.
+ * Están en la capa de Dominio porque:
+ * - Son conceptos del negocio (tipo de mascota, estado, género)
+ * - No tienen dependencias externas (es Kotlin puro)
+ * - Mantiene type-safety en toda la app
  */
 
 enum class Type(
