@@ -1,8 +1,10 @@
 package ar.edu.unlam.mobile.scaffolding.di
 
 import ar.edu.unlam.mobile.scaffolding.data.repository.LocationRepositoryImpl
+import ar.edu.unlam.mobile.scaffolding.data.repository.RouteRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.data.repository.SensorRepositoryImpl
 import ar.edu.unlam.mobile.scaffolding.domain.repository.LocationRepository
+import ar.edu.unlam.mobile.scaffolding.domain.repository.RouteRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.SensorRepository
 import dagger.Binds
 import dagger.Module
@@ -31,4 +33,12 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindSensorRepository(impl: SensorRepositoryImpl): SensorRepository
+
+    /**
+     * Conecta RouteRepository (interface) con RouteRepositoryImpl (implementación).
+     * Usado para obtener rutas desde Google Directions API.
+     */
+    @Binds
+    @Singleton
+    abstract fun bindRouteRepository(impl: RouteRepositoryImpl): RouteRepository
 }
