@@ -6,8 +6,10 @@ import androidx.lifecycle.viewModelScope
 import ar.edu.unlam.mobile.scaffolding.domain.model.SearchMode
 import ar.edu.unlam.mobile.scaffolding.domain.repository.LocationRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.PetsRepository
+import ar.edu.unlam.mobile.scaffolding.domain.repository.RouteRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.SensorRepository
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.CalculateBearingUseCase
+import com.google.android.gms.maps.model.LatLng
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,6 +18,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -34,6 +37,7 @@ class SearchViewModel
     constructor(
         private val locationRepository: LocationRepository,
         private val sensorRepository: SensorRepository,
+        private val routeRepository: RouteRepository,
         private val calculateBearingUseCase: CalculateBearingUseCase,
         private val petsRepository: PetsRepository,
         savedStateHandle: SavedStateHandle,
@@ -60,6 +64,12 @@ class SearchViewModel
          * Se cancela cuando se destruye el ViewModel.
          */
         private var locationJob: Job? = null
+
+        /**
+         * Job que carga la ruta desde Google Directions API.
+         * Se cancela si se inicia una nueva carga o se cambia de modo.
+         */
+        private var routeJob: Job? = null
 
         // ===== INICIALIZACIÓN =====
 
@@ -104,11 +114,15 @@ class SearchViewModel
                 SearchMode.RADAR -> {
                     // Activar el listener de sensores
                     startListeningToSensors()
+                    // Cancelar cualquier carga de ruta en progreso
+                    routeJob?.cancel()
                 }
 
                 SearchMode.ROUTE -> {
                     // Desactivar el listener de sensores
                     stopListeningToSensors()
+                    // Cargar la ruta desde Google Directions API
+                    loadRoute()
                 }
             }
         }
@@ -242,6 +256,52 @@ class SearchViewModel
         }
 
         /**
+         * Carga la ruta desde Google Directions API.
+         *
+         * Solo se ejecuta si tenemos ubicación del usuario y de la mascota.
+         * La ruta se guarda en el estado para que la UI la dibuje.
+         */
+        private fun loadRoute() {
+            // Cancelar cualquier carga anterior
+            routeJob?.cancel()
+
+            val currentState = _uiState.value
+            val userLoc = currentState.userLocation ?: return
+            val pet = currentState.pet ?: return
+
+            // Convertir a LatLng de Google Maps
+            val origin = LatLng(userLoc.latitude, userLoc.longitude)
+            val destination = LatLng(pet.latitude, pet.longitude)
+
+            // Iniciar carga
+            _uiState.update { it.copy(isLoadingRoute = true, errorMessage = null) }
+
+            routeJob =
+                viewModelScope.launch {
+                    val result = routeRepository.getRoute(origin, destination)
+
+                    result.fold(
+                        onSuccess = { route ->
+                            _uiState.update {
+                                it.copy(
+                                    route = route,
+                                    isLoadingRoute = false,
+                                )
+                            }
+                        },
+                        onFailure = { exception ->
+                            _uiState.update {
+                                it.copy(
+                                    isLoadingRoute = false,
+                                    errorMessage = "Error al obtener ruta: ${exception.message}",
+                                )
+                            }
+                        },
+                    )
+                }
+        }
+
+        /**
          * Se llama automáticamente cuando el ViewModel se destruye.
          * Limpia los recursos (cancela los listeners).
          */
@@ -249,5 +309,6 @@ class SearchViewModel
             super.onCleared()
             stopListeningToSensors()
             stopListeningToLocation()
+            routeJob?.cancel()
         }
     }

@@ -1,6 +1,7 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
@@ -37,6 +38,23 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        // Configuración de API Keys
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localPropertiesFile.inputStream().use { stream ->
+                localProperties.load(stream)
+            }
+        }
+
+        // API Key para Google Directions API
+        val googleDirectionsApiKey = localProperties.getProperty("GOOGLE_DIRECTIONS_API_KEY") ?: "PLACEHOLDER_API_KEY"
+        buildConfigField("String", "GOOGLE_DIRECTIONS_API_KEY", "\"$googleDirectionsApiKey\"")
+
+        // API Key para Google Maps SDK
+        val googleMapsApiKey = localProperties.getProperty("GOOGLE_MAPS_API_KEY") ?: "PLACEHOLDER_API_KEY"
+        resValue("string", "google_maps_key", googleMapsApiKey)
     }
 
     buildTypes {
@@ -54,10 +72,12 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "META-INF/versions/9/OSGI-INF/MANIFEST.MF"
         }
     }
 }
@@ -129,4 +149,19 @@ dependencies {
 
     // Accompanist
     implementation(libs.accompanist.permissions)
+
+    // Gson - JSON serialization/deserialization
+    implementation(libs.gson)
+
+    // Retrofit - HTTP client
+    implementation(libs.retrofit)
+
+    // Retrofit Gson Converter - Conecta Retrofit con Gson
+    implementation(libs.retrofit.converter.gson)
+
+    // OkHttp Loggin Interceptor - Para ver las peticiones HTTP en Logcat (para debug)
+    implementation(libs.okhttp.logging.interceptor)
+
+    // Google Maps Utils (para decodificar polylines)
+    implementation(libs.maps.utils)
 }

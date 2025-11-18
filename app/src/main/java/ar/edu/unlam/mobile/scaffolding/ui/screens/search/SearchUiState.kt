@@ -2,6 +2,7 @@ package ar.edu.unlam.mobile.scaffolding.ui.screens.search
 
 import ar.edu.unlam.mobile.scaffolding.domain.model.DeviceOrientation
 import ar.edu.unlam.mobile.scaffolding.domain.model.Pet
+import ar.edu.unlam.mobile.scaffolding.domain.model.Route
 import ar.edu.unlam.mobile.scaffolding.domain.model.SearchMode
 import ar.edu.unlam.mobile.scaffolding.domain.model.UserLocation
 import kotlin.math.abs
@@ -58,6 +59,16 @@ data class SearchUiState(
      * null = no hay error.
      */
     val errorMessage: String? = null,
+    /**
+     * Ruta calculada desde el usuario hasta la mascota.
+     * Solo se usa en modo ROUTE.
+     * null = aún no se calculó la ruta.
+     */
+    val route: Route? = null,
+    /**
+     * Indica si se está cargando la ruta desde Google Directions API.
+     */
+    val isLoadingRoute: Boolean = false,
 ) {
     /**
      * Propiedad computada: ¿Está todo listo para mostrar el radar/mapa?

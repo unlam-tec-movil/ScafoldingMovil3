@@ -54,6 +54,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapProperties
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 
@@ -232,7 +233,9 @@ fun SearchScreen(
             cameraPositionState = cameraPositionState,
             properties =
                 MapProperties(
-                    isMyLocationEnabled = false, // Apagado para evitar Z-fighting con el marker
+                    // En ROUTE: mostrar punto azul de ubicación para orientación
+                    // En RADAR: deshabilitado porque ya tenemos la flecha central
+                    isMyLocationEnabled = (uiState.searchMode == SearchMode.ROUTE),
                 ),
             uiSettings =
                 MapUiSettings(
@@ -258,6 +261,17 @@ fun SearchScreen(
                     icon = BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED),
                 )
             }
+
+            // ===== POLYLINE DE LA RUTA (modo ROUTE) =====
+            if (uiState.searchMode == SearchMode.ROUTE) {
+                uiState.route?.let { route ->
+                    Polyline(
+                        points = route.points,
+                        color = Color.Blue,
+                        width = 12f,
+                    )
+                }
+            }
         }
 
         // ===== SEGMENTED BUTTON PARA CAMBIAR MODO =====
@@ -277,9 +291,8 @@ fun SearchScreen(
             ) {
                 SegmentedButton(
                     selected = uiState.searchMode == SearchMode.ROUTE,
-                    onClick = { /* viewModel.onSearchModeChanged(SearchMode.ROUTE) */ },
+                    onClick = { viewModel.onSearchModeChanged(SearchMode.ROUTE) },
                     shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
-                    enabled = false, // Deshabilitado hasta implementar ROUTE
                 ) {
                     Text("Ruta")
                 }
@@ -292,14 +305,22 @@ fun SearchScreen(
                 }
             }
 
-            // Mensaje explicativo si ROUTE está deshabilitado
+            // Mostrar distancia y duración cuando tenemos la ruta
             if (uiState.searchMode == SearchMode.ROUTE) {
-                Text(
-                    text = "Modo Ruta próximamente",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.padding(top = 4.dp),
-                )
+                uiState.route?.let { route ->
+                    Text(
+                        text = "${route.distanceText} - ${route.durationText}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier =
+                            Modifier
+                                .padding(top = 4.dp)
+                                .background(
+                                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
+                                    shape = RoundedCornerShape(8.dp),
+                                ).padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
+                }
             }
         }
 
@@ -317,7 +338,7 @@ fun SearchScreen(
         }
 
         // ===== INDICADOR DE CARGA =====
-        if (uiState.isLoadingLocation) {
+        if (uiState.isLoadingLocation || uiState.isLoadingRoute) {
             CircularProgressIndicator(
                 modifier =
                     Modifier
