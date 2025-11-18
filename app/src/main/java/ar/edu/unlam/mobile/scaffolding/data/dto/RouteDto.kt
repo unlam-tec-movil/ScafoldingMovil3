@@ -13,5 +13,5 @@ data class RouteDto(
     @SerializedName("legs")
     val legs: List<LegDto>,
     @SerializedName("overview_polyline")
-    val overviewPolyline: PolylineDto
+    val overviewPolyline: PolylineDto,
 )

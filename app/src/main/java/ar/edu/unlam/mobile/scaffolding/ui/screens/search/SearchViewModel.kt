@@ -10,7 +10,6 @@ import ar.edu.unlam.mobile.scaffolding.domain.repository.RouteRepository
 import ar.edu.unlam.mobile.scaffolding.domain.repository.SensorRepository
 import ar.edu.unlam.mobile.scaffolding.domain.usecase.CalculateBearingUseCase
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.launch
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +18,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
@@ -276,28 +276,29 @@ class SearchViewModel
             // Iniciar carga
             _uiState.update { it.copy(isLoadingRoute = true, errorMessage = null) }
 
-            routeJob = viewModelScope.launch {
-                val result = routeRepository.getRoute(origin, destination)
+            routeJob =
+                viewModelScope.launch {
+                    val result = routeRepository.getRoute(origin, destination)
 
-                result.fold(
-                    onSuccess = { route ->
-                        _uiState.update {
-                            it.copy(
-                                route = route,
-                                isLoadingRoute = false,
-                            )
-                        }
-                    },
-                    onFailure = { exception ->
-                        _uiState.update {
-                            it.copy(
-                                isLoadingRoute = false,
-                                errorMessage = "Error al obtener ruta: ${exception.message}",
-                            )
-                        }
-                    },
-                )
-            }
+                    result.fold(
+                        onSuccess = { route ->
+                            _uiState.update {
+                                it.copy(
+                                    route = route,
+                                    isLoadingRoute = false,
+                                )
+                            }
+                        },
+                        onFailure = { exception ->
+                            _uiState.update {
+                                it.copy(
+                                    isLoadingRoute = false,
+                                    errorMessage = "Error al obtener ruta: ${exception.message}",
+                                )
+                            }
+                        },
+                    )
+                }
         }
 
         /**

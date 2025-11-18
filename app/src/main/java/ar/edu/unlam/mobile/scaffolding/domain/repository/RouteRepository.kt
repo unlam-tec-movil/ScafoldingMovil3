@@ -15,6 +15,6 @@ import com.google.android.gms.maps.model.LatLng
 interface RouteRepository {
     suspend fun getRoute(
         origin: LatLng,
-        destination: LatLng
+        destination: LatLng,
     ): Result<Route>
 }

@@ -48,6 +48,6 @@ fun DirectionsResponseDto.toDomain(): Route {
         distanceMeters = distanceMeters,
         durationSeconds = durationSeconds,
         distanceText = distanceText,
-        durationText = durationText
+        durationText = durationText,
     )
 }

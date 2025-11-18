@@ -13,5 +13,5 @@ import com.google.gson.annotations.SerializedName
  */
 data class PolylineDto(
     @SerializedName("points")
-    val points: String
+    val points: String,
 )

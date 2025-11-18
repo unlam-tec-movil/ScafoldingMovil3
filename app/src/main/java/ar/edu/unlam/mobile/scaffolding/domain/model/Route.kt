@@ -14,7 +14,7 @@ import com.google.android.gms.maps.model.LatLng
 data class Route(
     val points: List<LatLng>,
     val distanceMeters: Int,
-    val durationSeconds:Int,
+    val durationSeconds: Int,
     val distanceText: String,
-    val durationText: String
-    )
+    val durationText: String,
+)

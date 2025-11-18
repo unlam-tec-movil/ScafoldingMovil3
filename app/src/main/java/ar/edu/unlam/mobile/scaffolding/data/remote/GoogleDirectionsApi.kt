@@ -16,6 +16,6 @@ interface GoogleDirectionsApi {
         @Query("destination") destination: String,
         @Query("mode") mode: String = "walking",
         @Query("language") language: String = "es",
-        @Query("key") apiKey: String
+        @Query("key") apiKey: String,
     ): DirectionsResponseDto
 }

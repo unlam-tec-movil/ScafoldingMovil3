@@ -11,5 +11,5 @@ data class LegDto(
     @SerializedName("distance")
     val distance: DistanceDto,
     @SerializedName("duration")
-    val duration: DurationDto
+    val duration: DurationDto,
 )

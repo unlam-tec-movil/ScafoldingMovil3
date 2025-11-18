@@ -80,6 +80,5 @@ object NetworkModule {
      */
     @Provides
     @Singleton
-    fun provideGoogleDirectionsApi(retrofit: Retrofit): GoogleDirectionsApi =
-        retrofit.create(GoogleDirectionsApi::class.java)
+    fun provideGoogleDirectionsApi(retrofit: Retrofit): GoogleDirectionsApi = retrofit.create(GoogleDirectionsApi::class.java)
 }
