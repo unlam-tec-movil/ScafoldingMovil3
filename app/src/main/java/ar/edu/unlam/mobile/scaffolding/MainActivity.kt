@@ -34,12 +34,19 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostMissingPetScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.screens.search.SearchScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.user.PersonalDetailsScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.user.PersonalDetailsViewModel
+import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserPetsScreen
+import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserPetsViewModel
+import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.editProfile.EditProfile
-import ar.edu.unlam.mobile.scaffolding.ui.screens.userPosts.MyPetsScreen
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ScaffoldingV2Theme
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
+
+// 👉 Constante para la ruta de PersonalDetails
+const val PERSONAL_DETAILS_ROUTE = "personal_details"
 
 @AndroidEntryPoint
 class MainActivity :
@@ -128,7 +135,6 @@ fun MainScreen() {
                 MapScreen()
             }
 
-            // Ruta para detalles de mascota
             composable(
                 "pet_detail/{petId}",
                 arguments = listOf(navArgument("petId") { type = NavType.StringType }),
@@ -143,8 +149,6 @@ fun MainScreen() {
                 )
             }
 
-            // Ruta para búsqueda con Radar
-            // El petId se pasa en la ruta y el ViewModel lo obtiene del SavedStateHandle
             composable(
                 "search/{petId}",
                 arguments = listOf(navArgument("petId") { type = NavType.StringType }),
@@ -156,17 +160,13 @@ fun MainScreen() {
                 EditProfile(controller)
             }
 
-            composable("misposts") {
-                MyPetsScreen()
-            }
-
             composable(
                 "user/{id}",
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
             ) { backStackEntry ->
                 val id = backStackEntry.arguments?.getString("id") ?: ""
                 UserScreen(
-                    onDetallesClick = { /* si necesitás navegar a detalles personales */ },
+                    onDetallesClick = { controller.navigate(PERSONAL_DETAILS_ROUTE) },
                     onMascotasClick = { controller.navigate("mis_mascotas/$id") },
                     onReportesClick = { controller.navigate("mis_reportes/$id") },
                     onLogoutClick = {
@@ -178,11 +178,33 @@ fun MainScreen() {
                 )
             }
 
-            // Opcional: rutas destino para mascotas/reportes
+            composable(PERSONAL_DETAILS_ROUTE) {
+                val viewModel: PersonalDetailsViewModel = hiltViewModel()
+                PersonalDetailsScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { controller.popBackStack() } // 👉 vuelve a UserScreen
+                )
+            }
+
+            // 👉 Nueva ruta para mis_mascotas
             composable(
                 "mis_mascotas/{userId}",
                 arguments = listOf(navArgument("userId") { type = NavType.StringType }),
-            ) { /* MisMascotasScreen(controller) */ }
+            ) { backStackEntry ->
+                val userId = backStackEntry.arguments?.getString("userId") ?: ""
+                val petsViewModel: UserPetsViewModel = hiltViewModel()
+                val userViewModel: UserViewModel = hiltViewModel()
+
+                // ⚠️ Obtenemos el usuario desde Firestore y sus postIds
+                val userState = userViewModel.uiState
+                val petIds = userState.user?.postIds ?: emptyList()
+
+                UserPetsScreen(
+                    viewModel = petsViewModel,
+                    petIds = petIds,
+                    onNavigateBack = { controller.popBackStack() }
+                )
+            }
 
             composable(
                 "mis_reportes/{userId}",
@@ -230,3 +252,5 @@ fun AppNavHost() {
         }
     }
 }
+
+

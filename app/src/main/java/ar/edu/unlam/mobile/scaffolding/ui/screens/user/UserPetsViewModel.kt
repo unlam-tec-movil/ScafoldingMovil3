@@ -5,36 +5,37 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import ar.edu.unlam.mobile.scaffolding.domain.model.User
-import ar.edu.unlam.mobile.scaffolding.domain.repository.UserRepository
+import ar.edu.unlam.mobile.scaffolding.domain.model.Pet
+import ar.edu.unlam.mobile.scaffolding.domain.repository.PetsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class UserUiState(
+data class UserPetsUiState(
     val isLoading: Boolean = false,
-    val user: User? = null,
+    val pets: List<Pet> = emptyList(),
     val error: String? = null
 )
 
 @HiltViewModel
-class UserViewModel @Inject constructor(
-    private val userRepository: UserRepository
+class UserPetsViewModel @Inject constructor(
+    private val petsRepository: PetsRepository
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(UserUiState())
+    var uiState by mutableStateOf(UserPetsUiState())
         private set
 
-    fun loadUser(userId: String) {
+    fun loadUserPets(ids: List<String>) {
         uiState = uiState.copy(isLoading = true)
         viewModelScope.launch {
             try {
-                val user = userRepository.getUserById(userId) // tu repo que trae el User desde Firestore
-                uiState = uiState.copy(isLoading = false, user = user)
+                petsRepository.getPetsByIds(ids).collectLatest { pets ->
+                    uiState = uiState.copy(isLoading = false, pets = pets)
+                }
             } catch (e: Exception) {
                 uiState = uiState.copy(isLoading = false, error = e.message)
             }
         }
     }
 }
-

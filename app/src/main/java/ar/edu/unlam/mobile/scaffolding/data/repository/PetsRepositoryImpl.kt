@@ -20,55 +20,60 @@ import ar.edu.unlam.mobile.scaffolding.domain.model.Pet as PetDomain
  * - Convierte entre PetDto (Firebase) y Pet (dominio) usando mappers
  * - Implementa la interfaz PetsRepository del dominio
  */
-class PetsRepositoryImpl
-    @Inject
-    constructor(
-        private val db: FirebaseFirestore,
-    ) : PetsRepository {
-        override fun getAllPets(): Flow<List<PetDomain>> =
-            db
-                .collection("Pets")
-                .snapshots()
-                .map { snap ->
-                    snap.documents.mapNotNull { doc ->
-                        doc
-                            .toObject(PetDto::class.java)
-                            ?.copy(id = doc.id)
-                            ?.toDomain() // DTO → Domain
-                    }
-                }
 
-        override fun getPetsByIds(ids: List<String>): Flow<List<PetDomain>> =
-            if (ids.isEmpty()) {
-                flow { emit(emptyList()) }
-            } else {
-                db
-                    .collection("Pets")
-                    .whereIn(FieldPath.documentId(), ids)
-                    .snapshots()
-                    .map { snapshot ->
-                        snapshot.toObjects(PetDto::class.java).map { it.toDomain() } // DTO → Domain
-                    }
+class PetsRepositoryImpl @Inject constructor(
+    private val db: FirebaseFirestore,
+) : PetsRepository {
+
+    override fun getAllPets(): Flow<List<PetDomain>> =
+        db.collection("Pets")
+            .snapshots()
+            .map { snap ->
+                snap.documents.mapNotNull { doc ->
+                    doc.toObject(PetDto::class.java)
+                        ?.copy(id = doc.id)
+                        ?.toDomain()
+                }
             }
 
-        override fun getPetById(petId: String): Flow<PetDomain?> =
-            db
-                .collection("Pets")
-                .document(petId)
+    override fun getPetsByIds(ids: List<String>): Flow<List<PetDomain>> =
+        if (ids.isEmpty()) {
+            flow { emit(emptyList()) }
+        } else {
+            db.collection("Pets")
+                .whereIn(FieldPath.documentId(), ids)
                 .snapshots()
-                .map { doc ->
-                    doc
-                        .toObject(PetDto::class.java)
-                        ?.copy(id = doc.id)
-                        ?.toDomain() // DTO → Domain
+                .map { snapshot ->
+                    snapshot.toObjects(PetDto::class.java).map { it.toDomain() }
                 }
-
-        override suspend fun savePet(pet: PetDomain): String {
-            val docRef = db.collection("Pets").document()
-            val petDto = pet.toDto().copy(id = docRef.id) // Domain → DTO
-
-            docRef.set(petDto).await()
-
-            return docRef.id
         }
+
+    override fun getPetById(petId: String): Flow<PetDomain?> =
+        db.collection("Pets")
+            .document(petId)
+            .snapshots()
+            .map { doc ->
+                doc.toObject(PetDto::class.java)
+                    ?.copy(id = doc.id)
+                    ?.toDomain()
+            }
+
+    override suspend fun savePet(pet: PetDomain): String {
+        val docRef = db.collection("Pets").document()
+        val petDto = pet.toDto().copy(id = docRef.id)
+        docRef.set(petDto).await()
+        return docRef.id
     }
+
+    override fun getPetsByUser(userId: String): Flow<List<PetDomain>> =
+        db.collection("Pets")
+            .whereEqualTo("ownerId", userId)
+            .snapshots()
+            .map { snapshot ->
+                snapshot.documents.mapNotNull { doc ->
+                    doc.toObject(PetDto::class.java)
+                        ?.copy(id = doc.id)
+                        ?.toDomain()
+                }
+            }
+}
