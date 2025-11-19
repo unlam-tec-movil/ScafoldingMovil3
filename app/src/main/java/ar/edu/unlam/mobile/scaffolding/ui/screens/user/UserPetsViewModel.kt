@@ -15,27 +15,28 @@ import javax.inject.Inject
 data class UserPetsUiState(
     val isLoading: Boolean = false,
     val pets: List<Pet> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
 )
 
 @HiltViewModel
-class UserPetsViewModel @Inject constructor(
-    private val petsRepository: PetsRepository
-) : ViewModel() {
+class UserPetsViewModel
+    @Inject
+    constructor(
+        private val petsRepository: PetsRepository,
+    ) : ViewModel() {
+        var uiState by mutableStateOf(UserPetsUiState())
+            private set
 
-    var uiState by mutableStateOf(UserPetsUiState())
-        private set
-
-    fun loadUserPets(ids: List<String>) {
-        uiState = uiState.copy(isLoading = true)
-        viewModelScope.launch {
-            try {
-                petsRepository.getPetsByIds(ids).collectLatest { pets ->
-                    uiState = uiState.copy(isLoading = false, pets = pets)
+        fun loadUserPets(ids: List<String>) {
+            uiState = uiState.copy(isLoading = true)
+            viewModelScope.launch {
+                try {
+                    petsRepository.getPetsByIds(ids).collectLatest { pets ->
+                        uiState = uiState.copy(isLoading = false, pets = pets)
+                    }
+                } catch (e: Exception) {
+                    uiState = uiState.copy(isLoading = false, error = e.message)
                 }
-            } catch (e: Exception) {
-                uiState = uiState.copy(isLoading = false, error = e.message)
             }
         }
     }
-}

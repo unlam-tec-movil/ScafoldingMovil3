@@ -1,13 +1,13 @@
 package ar.edu.unlam.mobile.scaffolding.ui.components
 
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.ui.graphics.graphicsLayer
 
 @Composable
@@ -25,7 +25,7 @@ fun BackFloatingButton(
         Icon(
             imageVector = Icons.Filled.KeyboardArrowRight,
             contentDescription = "Volver",
-            modifier = Modifier.graphicsLayer { scaleX = -1f }
+            modifier = Modifier.graphicsLayer { scaleX = -1f },
         )
     }
 }

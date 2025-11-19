@@ -33,11 +33,11 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostFoundPet
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostMissingPetScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.posts.PostViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.screens.search.SearchScreen
-import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.PersonalDetailsScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.PersonalDetailsViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserPetsScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserPetsViewModel
+import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.UserViewModel
 import ar.edu.unlam.mobile.scaffolding.ui.screens.user.editProfile.EditProfile
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ScaffoldingV2Theme
@@ -182,7 +182,7 @@ fun MainScreen() {
                 val viewModel: PersonalDetailsViewModel = hiltViewModel()
                 PersonalDetailsScreen(
                     viewModel = viewModel,
-                    onNavigateBack = { controller.popBackStack() } // 👉 vuelve a UserScreen
+                    onNavigateBack = { controller.popBackStack() }, // 👉 vuelve a UserScreen
                 )
             }
 
@@ -202,7 +202,7 @@ fun MainScreen() {
                 UserPetsScreen(
                     viewModel = petsViewModel,
                     petIds = petIds,
-                    onNavigateBack = { controller.popBackStack() }
+                    onNavigateBack = { controller.popBackStack() },
                 )
             }
 
@@ -252,5 +252,3 @@ fun AppNavHost() {
         }
     }
 }
-
-

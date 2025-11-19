@@ -1,8 +1,19 @@
 package ar.edu.unlam.mobile.scaffolding.ui.screens.user
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -18,7 +29,7 @@ fun UserPetsScreen(
     viewModel: UserPetsViewModel,
     petIds: List<String>,
     modifier: Modifier = Modifier,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
 ) {
     val state = viewModel.uiState
 
@@ -28,14 +39,15 @@ fun UserPetsScreen(
     }
 
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xFFF2F3F5)),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .background(Color(0xFFF2F3F5)),
     ) {
         FloatingParticlesBackgroundAnimated(
             particleCount = 24,
             excludeTopPx = with(androidx.compose.ui.platform.LocalDensity.current) { 68.dp.toPx() },
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         )
 
         Column(modifier = Modifier.fillMaxSize()) {
@@ -55,9 +67,10 @@ fun UserPetsScreen(
                 }
                 state.pets.isNotEmpty() -> {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp),
                         verticalArrangement = Arrangement.spacedBy(20.dp),
                     ) {
                         state.pets.forEach { pet ->
@@ -76,9 +89,10 @@ fun UserPetsScreen(
         // FAB flotante para volver
         BackFloatingButton(
             onClick = onNavigateBack,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(20.dp)
+            modifier =
+                Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(20.dp),
         )
     }
 }
@@ -91,9 +105,10 @@ fun PetCard(pet: Pet) {
         colors = CardDefaults.cardColors(containerColor = Color.White),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 20.dp, vertical = 18.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 18.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Text(pet.name, style = MaterialTheme.typography.titleMedium, color = Color(0xFF3C3C3C))

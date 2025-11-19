@@ -82,9 +82,8 @@ class LoginViewModel
                 }
         }
 
-    fun getCurrentUser(): User? {
-        val uid = auth.currentUser?.uid ?: return null
-        return runBlocking { userRepository.getUserById(uid) }
+        fun getCurrentUser(): User? {
+            val uid = auth.currentUser?.uid ?: return null
+            return runBlocking { userRepository.getUserById(uid) }
+        }
     }
-
-}

@@ -5,8 +5,12 @@ import kotlinx.coroutines.flow.Flow
 
 interface PetsRepository {
     fun getAllPets(): Flow<List<Pet>>
+
     fun getPetsByIds(ids: List<String>): Flow<List<Pet>>
+
     fun getPetById(petId: String): Flow<Pet?>
-    suspend fun savePet(pet: Pet): String   // 👉 devuelve el ID del pet guardado
+
+    suspend fun savePet(pet: Pet): String // 👉 devuelve el ID del pet guardado
+
     fun getPetsByUser(userId: String): Flow<List<Pet>>
 }

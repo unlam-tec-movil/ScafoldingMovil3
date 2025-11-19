@@ -14,27 +14,27 @@ import javax.inject.Inject
 data class UserUiState(
     val isLoading: Boolean = false,
     val user: User? = null,
-    val error: String? = null
+    val error: String? = null,
 )
 
 @HiltViewModel
-class UserViewModel @Inject constructor(
-    private val userRepository: UserRepository
-) : ViewModel() {
+class UserViewModel
+    @Inject
+    constructor(
+        private val userRepository: UserRepository,
+    ) : ViewModel() {
+        var uiState by mutableStateOf(UserUiState())
+            private set
 
-    var uiState by mutableStateOf(UserUiState())
-        private set
-
-    fun loadUser(userId: String) {
-        uiState = uiState.copy(isLoading = true)
-        viewModelScope.launch {
-            try {
-                val user = userRepository.getUserById(userId) // tu repo que trae el User desde Firestore
-                uiState = uiState.copy(isLoading = false, user = user)
-            } catch (e: Exception) {
-                uiState = uiState.copy(isLoading = false, error = e.message)
+        fun loadUser(userId: String) {
+            uiState = uiState.copy(isLoading = true)
+            viewModelScope.launch {
+                try {
+                    val user = userRepository.getUserById(userId) // tu repo que trae el User desde Firestore
+                    uiState = uiState.copy(isLoading = false, user = user)
+                } catch (e: Exception) {
+                    uiState = uiState.copy(isLoading = false, error = e.message)
+                }
             }
         }
     }
-}
-
