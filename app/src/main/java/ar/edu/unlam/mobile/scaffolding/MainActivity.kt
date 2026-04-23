@@ -14,15 +14,14 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavType
@@ -38,6 +37,7 @@ import ar.edu.unlam.mobile.scaffolding.ui.screens.HomeScreen
 import ar.edu.unlam.mobile.scaffolding.ui.screens.UserScreen
 import ar.edu.unlam.mobile.scaffolding.ui.theme.ScaffoldingV2Theme
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -64,6 +64,7 @@ fun MainScreen() {
     // a través del back stack
     val controller = rememberNavController()
     val snackBarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
     Scaffold(
         bottomBar = { BottomBar(controller = controller) },
         floatingActionButton = {
@@ -89,7 +90,9 @@ fun MainScreen() {
 
                 Snackbar(
                     modifier =
-                        Modifier.border(2.dp, MaterialTheme.colorScheme.secondary).padding(12.dp),
+                        Modifier
+                            .border(2.dp, MaterialTheme.colorScheme.secondary)
+                            .padding(12.dp),
                     action = {
                         TextButton(
                             onClick = { if (isError) data.dismiss() else data.performAction() },
@@ -124,7 +127,20 @@ fun MainScreen() {
                 arguments = listOf(navArgument("id") { type = NavType.StringType }),
             ) { navBackStackEntry ->
                 val id = navBackStackEntry.arguments?.getString("id") ?: "1"
-                UserScreen(userId = id, modifier = Modifier.padding(paddingValue))
+                UserScreen(
+                    userId = id,
+                    onError = {
+                        coroutineScope.launch {
+                            snackBarHostState.showSnackbar(
+                                SnackbarVisualsWithError(
+                                    it.message ?: "Error desconocido",
+                                    true,
+                                ),
+                            )
+                        }
+                    },
+                    modifier = Modifier.padding(paddingValue),
+                )
             }
         }
     }

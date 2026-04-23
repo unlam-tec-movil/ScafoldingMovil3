@@ -85,6 +85,7 @@ dependencies {
     ksp(libs.google.dagger.hilt.android.compiler)
     implementation(libs.google.dagger.hilt.android.testing)
     implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.androidx.hilt.lifecycle.viewmodel.compose)
     androidTestImplementation(libs.google.dagger.hilt.android.testing)
     testImplementation(libs.google.dagger.hilt.android.testing)
 }
